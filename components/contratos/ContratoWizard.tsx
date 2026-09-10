@@ -41,9 +41,13 @@ export function ContratoWizard({
   const puedeAvanzar = useMemo(() => {
     if (paso === 0) return Boolean(clienteId)
     if (paso === 1) return Boolean(propiedadId)
-    if (paso === 2) return Boolean(fechaInicio && montoTotal)
+    if (paso === 2) {
+      if (!fechaInicio || !montoTotal) return false
+      if (tipo === 'compraventa' && !plazoMeses) return false
+      return true
+    }
     return true
-  }, [paso, clienteId, propiedadId, fechaInicio, montoTotal])
+  }, [paso, clienteId, propiedadId, fechaInicio, montoTotal, tipo, plazoMeses])
 
   async function confirmar() {
     setError(null)
@@ -188,11 +192,17 @@ export function ContratoWizard({
               <div className="space-y-1">
                 <label htmlFor="plazo_meses" className="text-sm font-medium">
                   Plazo (meses)
+                  {tipo === 'compraventa' && (
+                    <span className="ml-1 font-normal text-gray-400">
+                      requerido para generar el calendario
+                    </span>
+                  )}
                 </label>
                 <input
                   id="plazo_meses"
                   type="number"
                   min="0"
+                  required={tipo === 'compraventa'}
                   value={plazoMeses}
                   onChange={(e) => setPlazoMeses(e.target.value)}
                   className="w-full rounded border px-3 py-2"
