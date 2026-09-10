@@ -1,10 +1,11 @@
 import Link from 'next/link'
 import { notFound, redirect } from 'next/navigation'
-import { obtenerCliente } from '@/lib/server/clientes'
+import { obtenerCliente, obtenerAmortizacion, obtenerSaldo } from '@/lib/server/clientes'
 import { listarPropiedades } from '@/lib/server/propiedades'
 import { getUsuarioActual } from '@/lib/server/auth'
 import { formatearCentavos } from '@/lib/utils/moneda'
 import { ROLES_GESTION_COMERCIAL } from '@/lib/utils/roles'
+import { CalendarioAmortizacion } from '@/components/cartera/CalendarioAmortizacion'
 
 const COLOR_POR_ESTADO_CONTRATO: Record<string, string> = {
   borrador: 'bg-gray-100 text-gray-700 border-gray-300',
@@ -24,9 +25,11 @@ export default async function ClienteDetallePage({
   const usuario = await getUsuarioActual()
   if (!usuario) redirect('/login')
 
-  const [cliente, propiedades] = await Promise.all([
+  const [cliente, propiedades, cuotas, saldo] = await Promise.all([
     obtenerCliente(id).catch(() => null),
     listarPropiedades(),
+    obtenerAmortizacion(id),
+    obtenerSaldo(id),
   ])
   if (!cliente) notFound()
 
@@ -85,6 +88,11 @@ export default async function ClienteDetallePage({
             ))}
           </div>
         )}
+      </div>
+
+      <div>
+        <h2 className="mb-2 font-medium">Calendario de amortización</h2>
+        <CalendarioAmortizacion cuotas={cuotas} saldo={saldo} />
       </div>
     </div>
   )
