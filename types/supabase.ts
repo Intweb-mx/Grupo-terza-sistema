@@ -227,6 +227,48 @@ export type Database = {
           },
         ]
       }
+      interacciones: {
+        Row: {
+          created_at: string | null
+          id: string
+          notas: string | null
+          prospecto_id: string
+          realizado_por: string | null
+          tipo: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          notas?: string | null
+          prospecto_id: string
+          realizado_por?: string | null
+          tipo: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          notas?: string | null
+          prospecto_id?: string
+          realizado_por?: string | null
+          tipo?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "interacciones_prospecto_id_fkey"
+            columns: ["prospecto_id"]
+            isOneToOne: false
+            referencedRelation: "prospectos"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "interacciones_realizado_por_fkey"
+            columns: ["realizado_por"]
+            isOneToOne: false
+            referencedRelation: "usuarios"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       pagos: {
         Row: {
           amortizacion_id: string | null
@@ -380,6 +422,53 @@ export type Database = {
           updated_at?: string | null
         }
         Relationships: []
+      }
+      prospectos: {
+        Row: {
+          asesor_id: string | null
+          created_at: string | null
+          email: string | null
+          etapa: string | null
+          fuente: string | null
+          id: string
+          interes: string | null
+          nombre: string
+          telefono: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          asesor_id?: string | null
+          created_at?: string | null
+          email?: string | null
+          etapa?: string | null
+          fuente?: string | null
+          id?: string
+          interes?: string | null
+          nombre: string
+          telefono?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          asesor_id?: string | null
+          created_at?: string | null
+          email?: string | null
+          etapa?: string | null
+          fuente?: string | null
+          id?: string
+          interes?: string | null
+          nombre?: string
+          telefono?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "prospectos_asesor_id_fkey"
+            columns: ["asesor_id"]
+            isOneToOne: false
+            referencedRelation: "usuarios"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       usuarios: {
         Row: {
