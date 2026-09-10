@@ -10,6 +10,7 @@ const NAV_POR_ROL: Record<string, { href: string; label: string }[]> = {
     { href: '/contratos', label: 'Contratos' },
     { href: '/prospectos', label: 'CRM' },
     { href: '/contabilidad', label: 'Contabilidad' },
+    { href: '/dashboard/usuarios', label: 'Usuarios' },
   ],
   socio: [
     { href: '/dashboard', label: 'Panel' },
@@ -21,6 +22,7 @@ const NAV_POR_ROL: Record<string, { href: string; label: string }[]> = {
     { href: '/clientes', label: 'Cartera' },
     { href: '/contratos', label: 'Contratos' },
     { href: '/prospectos', label: 'CRM' },
+    { href: '/dashboard/usuarios', label: 'Usuarios' },
   ],
   asesor: [
     { href: '/dashboard', label: 'Panel' },
