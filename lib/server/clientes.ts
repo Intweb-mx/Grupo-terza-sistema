@@ -39,6 +39,72 @@ export async function obtenerCliente(id: string) {
   return { ...cliente, contratos }
 }
 
+// El calendario vive por contrato, no por cliente — se toma el contrato de
+// compraventa más reciente del cliente (normalmente hay uno solo).
+async function contratoConAmortizacion(
+  supabase: Awaited<ReturnType<typeof createServerSupabaseClient>>,
+  clienteId: string
+) {
+  const { data, error } = await supabase
+    .from('contratos')
+    .select('id')
+    .eq('cliente_id', clienteId)
+    .eq('tipo', 'compraventa')
+    .order('created_at', { ascending: false })
+    .limit(1)
+    .maybeSingle()
+  if (error) throw error
+  return data
+}
+
+export async function obtenerAmortizacion(clienteId: string) {
+  const supabase = await createServerSupabaseClient()
+  const contrato = await contratoConAmortizacion(supabase, clienteId)
+  if (!contrato) return []
+
+  const { data, error } = await supabase
+    .from('amortizaciones')
+    .select('numero_pago, fecha_corte, capital, interes, penalizacion, total, estado, fecha_pago_real')
+    .eq('contrato_id', contrato.id)
+    .order('numero_pago', { ascending: true })
+  if (error) throw error
+  return data
+}
+
+export async function obtenerSaldo(clienteId: string) {
+  const supabase = await createServerSupabaseClient()
+  const contrato = await contratoConAmortizacion(supabase, clienteId)
+  if (!contrato) {
+    return { saldo_pendiente: 0, dias_atraso: 0, penalizacion_aplicada: 0, proxima_fecha_corte: null }
+  }
+
+  const { data: cuotas, error } = await supabase
+    .from('amortizaciones')
+    .select('fecha_corte, total, estado')
+    .eq('contrato_id', contrato.id)
+    .neq('estado', 'pagado')
+    .order('fecha_corte', { ascending: true })
+  if (error) throw error
+
+  const saldoPendiente = cuotas.reduce((suma, cuota) => suma + cuota.total, 0)
+  const proximaCuota = cuotas[0] ?? null
+
+  let diasAtraso = 0
+  if (proximaCuota) {
+    const hoy = new Date(new Date().toISOString().slice(0, 10))
+    const corte = new Date(proximaCuota.fecha_corte)
+    diasAtraso = Math.max(0, Math.round((hoy.getTime() - corte.getTime()) / 86_400_000))
+  }
+
+  return {
+    saldo_pendiente: saldoPendiente,
+    dias_atraso: diasAtraso,
+    // penalizacion_aplicada depende de la tabla penalizaciones (fase 6)
+    penalizacion_aplicada: 0,
+    proxima_fecha_corte: proximaCuota?.fecha_corte ?? null,
+  }
+}
+
 export type CrearClienteInput = {
   nombre: string
   apellidos: string
