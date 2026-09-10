@@ -28,8 +28,10 @@ export async function proxy(request: NextRequest) {
   } = await supabase.auth.getUser()
 
   if (!user) {
+    const esPortal = request.nextUrl.pathname.startsWith('/portal') ||
+      request.nextUrl.pathname.startsWith('/api/portal')
     const url = request.nextUrl.clone()
-    url.pathname = '/login'
+    url.pathname = esPortal ? '/portal/login' : '/login'
     return NextResponse.redirect(url)
   }
 
@@ -37,5 +39,10 @@ export async function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/dashboard/:path*', '/api/((?!auth|cron).*)'],
+  matcher: [
+    '/dashboard/:path*',
+    '/portal',
+    '/portal/((?!login).*)',
+    '/api/((?!auth|cron).*)',
+  ],
 }
