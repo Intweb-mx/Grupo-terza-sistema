@@ -143,6 +143,38 @@ POST /api/usuarios/invitar
      Solo dueno/administrador — 403 si no.
 ```
 
+### Portal de cliente
+
+Auth separada de personal interno: un cliente con cuenta de portal NUNCA
+tiene fila en `usuarios` (si la tuviera, heredaría las policies de rol
+interno). Se identifica por `clientes.user_id`. Invitación análoga a
+usuarios pero con metadata `{ tipo: "cliente", cliente_id }`, que le indica
+al trigger `handle_new_user()` que vincule `user_id` en vez de crear una
+fila en `usuarios`.
+
+```
+POST /api/clientes/:id/invitar
+     → { id, email, invitado_en }
+     Solo dueno/administrador — 403 si no. El cliente debe tener email.
+
+GET  /api/portal/saldo
+     → { saldo_pendiente, dias_atraso, proxima_fecha }
+
+GET  /api/portal/amortizacion
+     → [{ numero_pago, fecha_corte, capital, interes, penalizacion, total, estado, fecha_pago_real }]
+
+GET  /api/portal/pagos
+     → [{ id, monto, fecha, referencia, metodo_pago }]
+
+GET  /api/portal/estado-cuenta      — pendiente, necesita elegir librería de PDF
+```
+
+⚡ **Coordinar con Frontend:** las rutas `/api/portal/*` pasan por el mismo
+`proxy.ts` que el resto de `/api/*` (excepto `/api/auth` y `/api/cron`) — si
+no hay sesión, redirige a `/login` (la de personal interno), no a
+`/portal/login`. El portal necesita su propia página de login y su propia
+lógica de protección de rutas bajo `/portal/*`, separada de `proxy.ts`.
+
 ### Propiedades
 
 ```

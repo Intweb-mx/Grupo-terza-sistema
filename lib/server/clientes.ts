@@ -1,4 +1,38 @@
 import { createServerSupabaseClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/supabase/admin'
+import { getUsuarioActual } from '@/lib/server/auth'
+
+export class NoAutorizadoError extends Error {}
+
+const ROLES_QUE_INVITAN_CLIENTE = ['dueno', 'administrador'] as const
+
+// Invita al cliente al portal de autoservicio. El metadata `tipo: 'cliente'`
+// es lo que le dice al trigger handle_new_user() (migración 009) que NO
+// debe crear una fila en usuarios — un cliente nunca debe tener rol
+// interno, eso le abriría acceso a todas las policies de personal.
+export async function invitarClienteAlPortal(clienteId: string) {
+  const solicitante = await getUsuarioActual()
+  if (!solicitante || !ROLES_QUE_INVITAN_CLIENTE.includes(solicitante.rol as 'dueno' | 'administrador')) {
+    throw new NoAutorizadoError('Solo dueño o administrador pueden invitar clientes al portal')
+  }
+
+  const supabase = await createServerSupabaseClient()
+  const { data: cliente, error: errorCliente } = await supabase
+    .from('clientes')
+    .select('email')
+    .eq('id', clienteId)
+    .single()
+  if (errorCliente) throw errorCliente
+  if (!cliente.email) throw new Error('El cliente no tiene email registrado')
+
+  const admin = createAdminClient()
+  const { data, error } = await admin.auth.admin.inviteUserByEmail(cliente.email, {
+    data: { tipo: 'cliente', cliente_id: clienteId },
+  })
+  if (error) throw error
+
+  return { id: data.user.id, email: data.user.email, invitado_en: data.user.created_at }
+}
 
 // saldo_pendiente, proxima_fecha_corte y estado_pago quedan en null hasta
 // que exista la tabla amortizaciones (fase 5). Se completan ahí.
