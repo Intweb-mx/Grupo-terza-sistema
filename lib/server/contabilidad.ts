@@ -1,5 +1,15 @@
 import { createServerSupabaseClient } from '@/lib/supabase/server'
 
+export async function listarProyectos() {
+  const supabase = await createServerSupabaseClient()
+  const { data, error } = await supabase
+    .from('proyectos')
+    .select('id, nombre, descripcion, activo')
+    .order('nombre', { ascending: true })
+  if (error) throw error
+  return data
+}
+
 // Regla de negocio #4: la utilidad se calcula sobre contabilidad separada
 // por proyecto. Los gastos fijos del negocio (movimientos tipo 'egreso' sin
 // proyecto asignado — renta de oficina, nómina administrativa, etc.) se
@@ -50,6 +60,28 @@ export async function obtenerEstadoProyecto(proyectoId: string) {
     utilidad_bruta: utilidadBruta,
     utilidad_neta: utilidadNeta,
   }
+}
+
+// Reparto de utilidades por socio, sobre la utilidad_neta de ESE proyecto
+// (regla de negocio #4 — no sobre ingresos totales del negocio). Cada socio
+// recibe su porcentaje_participacion de esa utilidad.
+export async function obtenerRepartoUtilidades(proyectoId: string) {
+  const estado = await obtenerEstadoProyecto(proyectoId)
+  const supabase = await createServerSupabaseClient()
+
+  const { data: socios, error } = await supabase
+    .from('socios')
+    .select('id, nombre, porcentaje_participacion')
+  if (error) throw error
+
+  const reparto = socios.map((socio) => ({
+    socio_id: socio.id,
+    nombre: socio.nombre,
+    porcentaje_participacion: socio.porcentaje_participacion,
+    monto_correspondiente: Math.round((estado.utilidad_neta * socio.porcentaje_participacion) / 100),
+  }))
+
+  return { utilidad_neta: estado.utilidad_neta, reparto }
 }
 
 export type RegistrarMovimientoInput = {
