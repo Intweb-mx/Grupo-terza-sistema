@@ -80,6 +80,17 @@ export async function crearProspecto(input: CrearProspectoInput) {
   return data
 }
 
+export async function listarInteracciones(prospectoId: string) {
+  const supabase = await createServerSupabaseClient()
+  const { data, error } = await supabase
+    .from('interacciones')
+    .select('id, tipo, notas, realizado_por, created_at')
+    .eq('prospecto_id', prospectoId)
+    .order('created_at', { ascending: false })
+  if (error) throw error
+  return data
+}
+
 export type AgregarInteraccionInput = {
   tipo: 'llamada' | 'visita' | 'whatsapp' | 'email' | 'reunion'
   notas?: string

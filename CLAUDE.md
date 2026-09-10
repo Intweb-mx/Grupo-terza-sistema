@@ -260,6 +260,9 @@ POST /api/prospectos
      ← { nombre, telefono, email, interes, asesor_id, fuente }
      → { id, created_at }
 
+GET  /api/prospectos/:id/interacciones
+     → [{ id, tipo, notas, realizado_por, created_at }]
+
 POST /api/prospectos/:id/interaccion
      ← { tipo: "llamada" | "visita" | "whatsapp" | "email", notas }
      → { id, created_at }
@@ -280,8 +283,16 @@ elegir). `lib/server/cfdi.ts` tiene la interfaz lista (`emitirCfdi`,
 `cancelarCfdi`) pero lanza error hasta que se configure un proveedor.
 
 ```
+GET  /api/contabilidad/proyectos
+     → [{ id, nombre, descripcion, activo }]
+
 GET  /api/contabilidad/proyectos/:id/estado
      → { ingresos, gastos_fijos, gastos_variables, utilidad_bruta, utilidad_neta }
+
+GET  /api/contabilidad/proyectos/:id/reparto
+     → { utilidad_neta, reparto: [{ socio_id, nombre, porcentaje_participacion, monto_correspondiente }] }
+     monto_correspondiente = utilidad_neta del proyecto × porcentaje_participacion
+     del socio (regla de negocio #4 — nunca sobre ingresos totales del negocio).
 
 GET  /api/contabilidad/movimientos
      → [{ id, proyecto_id, tipo, categoria, descripcion, monto, fecha, referencia, cfdi_uuid, cfdi_estado }]
