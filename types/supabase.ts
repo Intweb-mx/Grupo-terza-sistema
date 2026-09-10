@@ -110,7 +110,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      usuario_rol_actual: { Args: never; Returns: string }
     }
     Enums: {
       [_ in never]: never
