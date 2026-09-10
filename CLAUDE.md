@@ -258,12 +258,28 @@ GET  /api/contabilidad/movimientos
 POST /api/contabilidad/movimientos
      ← { proyecto_id, tipo: "ingreso" | "egreso", categoria, descripcion, monto, fecha, referencia }
      → { id, created_at }
+```
 
-GET  /api/contabilidad/flujo-proyectado          — fase 9
-     → [{ mes, ingresos_esperados, egresos_esperados, saldo_proyectado }]
+### Reportes y panel ejecutivo
 
-GET  /api/reportes/cartera-vencida               — fase 9
+Solo dueño, administrador o contador — 403 para cualquier otro rol (incluido
+asesor, que tiene su propio embudo en CRM pero no ve KPIs de todo el negocio).
+
+```
+GET  /api/reportes/kpis
+     → { propiedades_disponibles, propiedades_vendidas, ingresos_mes_actual,
+          clientes_en_mora, monto_cartera_vencida }
+
+GET  /api/reportes/cartera-vencida
      → [{ cliente_id, nombre, dias_atraso, monto_vencido, penalizacion_aplicada }]
+     Un renglón por cliente (agrega todas sus cuotas vencidas), ordenado por
+     días de atraso descendente.
+
+GET  /api/reportes/flujo-proyectado
+     → [{ mes, ingresos_esperados, egresos_esperados, saldo_proyectado }]
+     Próximos 12 meses agrupados. egresos_esperados siempre es 0 — no existe
+     una tabla de presupuesto/gastos futuros, solo histórico ya ocurrido en
+     movimientos_contables. saldo_proyectado = ingresos_esperados por ahora.
 ```
 
 ---
