@@ -25,7 +25,7 @@ export async function registrarPago(input: RegistrarPagoInput) {
 
   const { data: contrato, error: errorContrato } = await supabase
     .from('contratos')
-    .select('id')
+    .select('id, propiedad_id')
     .eq('cliente_id', input.cliente_id)
     .eq('tipo', 'compraventa')
     .order('created_at', { ascending: false })
@@ -71,6 +71,34 @@ export async function registrarPago(input: RegistrarPagoInput) {
       .eq('id', cuota.id)
     if (errorUpdate) throw errorUpdate
   }
+
+  // Regla: "movimiento de ingreso se registra al recibir un pago" (fase 8).
+  // Si la propiedad no tiene proyecto asignado, el ingreso queda sin
+  // proyecto (proyecto_id null) — no rompe el pago por eso.
+  //
+  // Usa el cliente admin: quien registra el pago puede ser un asesor, que
+  // no tiene permiso de escritura sobre movimientos_contables (solo
+  // dueño/administrador/contador). Es el mismo patrón del bug que ya
+  // apareció con el trigger de disponibilidad de propiedades (fase 4) — acá
+  // se evita desde el diseño en vez de descubrirlo probando.
+  const admin = createAdminClient()
+
+  const { data: propiedad } = await supabase
+    .from('propiedades')
+    .select('proyecto_id')
+    .eq('id', contrato.propiedad_id)
+    .single()
+
+  const { error: errorMovimiento } = await admin.from('movimientos_contables').insert({
+    proyecto_id: propiedad?.proyecto_id ?? null,
+    tipo: 'ingreso',
+    categoria: 'cobranza',
+    descripcion: `Pago de cliente ${input.cliente_id}`,
+    monto: input.monto,
+    fecha: input.fecha,
+    referencia: input.referencia,
+  })
+  if (errorMovimiento) throw errorMovimiento
 
   const { data: pendientes, error: errorSaldo } = await supabase
     .from('amortizaciones')

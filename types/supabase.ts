@@ -269,6 +269,59 @@ export type Database = {
           },
         ]
       }
+      movimientos_contables: {
+        Row: {
+          categoria: string
+          cfdi_estado: string | null
+          cfdi_motivo_cancelacion: string | null
+          cfdi_uuid: string | null
+          created_at: string | null
+          descripcion: string | null
+          fecha: string
+          id: string
+          monto: number
+          proyecto_id: string | null
+          referencia: string | null
+          tipo: string
+        }
+        Insert: {
+          categoria: string
+          cfdi_estado?: string | null
+          cfdi_motivo_cancelacion?: string | null
+          cfdi_uuid?: string | null
+          created_at?: string | null
+          descripcion?: string | null
+          fecha: string
+          id?: string
+          monto: number
+          proyecto_id?: string | null
+          referencia?: string | null
+          tipo: string
+        }
+        Update: {
+          categoria?: string
+          cfdi_estado?: string | null
+          cfdi_motivo_cancelacion?: string | null
+          cfdi_uuid?: string | null
+          created_at?: string | null
+          descripcion?: string | null
+          fecha?: string
+          id?: string
+          monto?: number
+          proyecto_id?: string | null
+          referencia?: string | null
+          tipo?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "movimientos_contables_proyecto_id_fkey"
+            columns: ["proyecto_id"]
+            isOneToOne: false
+            referencedRelation: "proyectos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       pagos: {
         Row: {
           amortizacion_id: string | null
@@ -464,6 +517,62 @@ export type Database = {
           {
             foreignKeyName: "prospectos_asesor_id_fkey"
             columns: ["asesor_id"]
+            isOneToOne: false
+            referencedRelation: "usuarios"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      proyectos: {
+        Row: {
+          activo: boolean | null
+          created_at: string | null
+          descripcion: string | null
+          id: string
+          nombre: string
+        }
+        Insert: {
+          activo?: boolean | null
+          created_at?: string | null
+          descripcion?: string | null
+          id?: string
+          nombre: string
+        }
+        Update: {
+          activo?: boolean | null
+          created_at?: string | null
+          descripcion?: string | null
+          id?: string
+          nombre?: string
+        }
+        Relationships: []
+      }
+      socios: {
+        Row: {
+          created_at: string | null
+          id: string
+          nombre: string
+          porcentaje_participacion: number
+          usuario_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          nombre: string
+          porcentaje_participacion: number
+          usuario_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          nombre?: string
+          porcentaje_participacion?: number
+          usuario_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "socios_usuario_id_fkey"
+            columns: ["usuario_id"]
             isOneToOne: false
             referencedRelation: "usuarios"
             referencedColumns: ["id"]
