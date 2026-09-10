@@ -2,7 +2,20 @@
 
 import { useMemo, useState } from 'react'
 import Link from 'next/link'
+import { LayoutGrid, MapPin } from 'lucide-react'
 import { formatearCentavos } from '@/lib/utils/moneda'
+import { Badge } from '@/components/ui/badge'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Card } from '@/components/ui/card'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { COLOR_POR_ESTADO, ESTADOS_DISPONIBILIDAD, TIPOS_PROPIEDAD } from './constantes'
 
 type Propiedad = {
@@ -17,17 +30,19 @@ type Propiedad = {
   lote_id?: string | null
 }
 
+const TODOS = 'todos'
+
 export function PropiedadesListado({ propiedades }: { propiedades: Propiedad[] }) {
   const [vista, setVista] = useState<'lista' | 'mapa'>('lista')
-  const [tipo, setTipo] = useState('')
+  const [tipo, setTipo] = useState(TODOS)
   const [ciudad, setCiudad] = useState('')
-  const [estado, setEstado] = useState('')
+  const [estado, setEstado] = useState(TODOS)
   const [precioMax, setPrecioMax] = useState('')
 
   const filtradas = useMemo(() => {
     return propiedades.filter((p) => {
-      if (tipo && p.tipo !== tipo) return false
-      if (estado && p.estado_disponibilidad !== estado) return false
+      if (tipo !== TODOS && p.tipo !== tipo) return false
+      if (estado !== TODOS && p.estado_disponibilidad !== estado) return false
       if (ciudad && !p.ciudad.toLowerCase().includes(ciudad.toLowerCase())) return false
       if (precioMax && p.precio > Number(precioMax) * 100) return false
       return true
@@ -36,111 +51,116 @@ export function PropiedadesListado({ propiedades }: { propiedades: Propiedad[] }
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-wrap items-end gap-3">
-        <div>
-          <label className="block text-xs font-medium text-gray-500">Tipo</label>
-          <select
-            value={tipo}
-            onChange={(e) => setTipo(e.target.value)}
-            className="rounded border px-2 py-1 text-sm"
-          >
-            <option value="">Todos</option>
-            {TIPOS_PROPIEDAD.map((t) => (
-              <option key={t} value={t}>
-                {t}
-              </option>
-            ))}
-          </select>
+      <Card className="flex flex-wrap items-end gap-4 p-4">
+        <div className="space-y-1.5">
+          <Label className="text-xs text-muted-foreground">Tipo</Label>
+          <Select value={tipo} onValueChange={setTipo}>
+            <SelectTrigger size="sm" className="w-36">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value={TODOS}>Todos</SelectItem>
+              {TIPOS_PROPIEDAD.map((t) => (
+                <SelectItem key={t} value={t}>
+                  {t}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
 
-        <div>
-          <label className="block text-xs font-medium text-gray-500">Ciudad</label>
-          <input
+        <div className="space-y-1.5">
+          <Label className="text-xs text-muted-foreground">Ciudad</Label>
+          <Input
             value={ciudad}
             onChange={(e) => setCiudad(e.target.value)}
-            className="rounded border px-2 py-1 text-sm"
             placeholder="Ciudad"
+            className="h-8 w-40"
           />
         </div>
 
-        <div>
-          <label className="block text-xs font-medium text-gray-500">Disponibilidad</label>
-          <select
-            value={estado}
-            onChange={(e) => setEstado(e.target.value)}
-            className="rounded border px-2 py-1 text-sm"
-          >
-            <option value="">Todas</option>
-            {ESTADOS_DISPONIBILIDAD.map((e) => (
-              <option key={e} value={e}>
-                {e}
-              </option>
-            ))}
-          </select>
+        <div className="space-y-1.5">
+          <Label className="text-xs text-muted-foreground">Disponibilidad</Label>
+          <Select value={estado} onValueChange={setEstado}>
+            <SelectTrigger size="sm" className="w-40">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value={TODOS}>Todas</SelectItem>
+              {ESTADOS_DISPONIBILIDAD.map((e) => (
+                <SelectItem key={e} value={e}>
+                  {e}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
 
-        <div>
-          <label className="block text-xs font-medium text-gray-500">Precio máximo (MXN)</label>
-          <input
+        <div className="space-y-1.5">
+          <Label className="text-xs text-muted-foreground">Precio máximo (MXN)</Label>
+          <Input
             type="number"
             value={precioMax}
             onChange={(e) => setPrecioMax(e.target.value)}
-            className="rounded border px-2 py-1 text-sm"
             placeholder="Sin límite"
+            className="h-8 w-36"
           />
         </div>
 
-        <div className="ml-auto flex gap-1 rounded border p-1 text-sm">
-          <button
-            type="button"
-            onClick={() => setVista('lista')}
-            className={`rounded px-2 py-1 ${vista === 'lista' ? 'bg-gray-900 text-white' : ''}`}
-          >
-            Lista
-          </button>
-          <button
-            type="button"
-            onClick={() => setVista('mapa')}
-            className={`rounded px-2 py-1 ${vista === 'mapa' ? 'bg-gray-900 text-white' : ''}`}
-          >
-            Mapa de lotes
-          </button>
-        </div>
-      </div>
+        <Tabs
+          value={vista}
+          onValueChange={(v) => setVista(v as 'lista' | 'mapa')}
+          className="ml-auto"
+        >
+          <TabsList>
+            <TabsTrigger value="lista" className="gap-1.5">
+              <LayoutGrid className="size-3.5" />
+              Lista
+            </TabsTrigger>
+            <TabsTrigger value="mapa" className="gap-1.5">
+              <MapPin className="size-3.5" />
+              Mapa
+            </TabsTrigger>
+          </TabsList>
+        </Tabs>
+      </Card>
 
       {filtradas.length === 0 && (
-        <p className="text-sm text-gray-500">No hay propiedades con esos filtros.</p>
+        <p className="text-sm text-muted-foreground">No hay propiedades con esos filtros.</p>
       )}
 
       {vista === 'lista' ? (
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {filtradas.map((p) => (
-            <Link
-              key={p.id}
-              href={`/propiedades/${p.id}`}
-              className="block rounded border p-4 hover:border-gray-400"
-            >
-              {p.imagen_url && (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img
-                  src={p.imagen_url}
-                  alt={p.titulo}
-                  className="mb-3 h-36 w-full rounded object-cover"
-                />
-              )}
-              <p className="font-medium">{p.titulo}</p>
-              <p className="text-sm text-gray-500">
-                {p.tipo} · {p.ciudad}
-                {p.superficie_m2 ? ` · ${p.superficie_m2} m²` : ''}
-              </p>
-              <p className="mt-1 font-semibold">{formatearCentavos(p.precio)}</p>
-              <span
-                className={`mt-2 inline-block rounded border px-2 py-0.5 text-xs ${
-                  COLOR_POR_ESTADO[p.estado_disponibilidad ?? ''] ?? 'bg-gray-100 text-gray-700'
-                }`}
-              >
-                {p.estado_disponibilidad ?? 'sin estado'}
-              </span>
+            <Link key={p.id} href={`/propiedades/${p.id}`}>
+              <Card className="gap-3 overflow-hidden py-0 transition-shadow hover:shadow-md">
+                <div className="aspect-video w-full bg-muted">
+                  {p.imagen_url && (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                      src={p.imagen_url}
+                      alt={p.titulo}
+                      className="h-full w-full object-cover"
+                    />
+                  )}
+                </div>
+                <div className="space-y-2 px-4 pb-4">
+                  <p className="font-medium">{p.titulo}</p>
+                  <p className="text-sm text-muted-foreground">
+                    {p.tipo} · {p.ciudad}
+                    {p.superficie_m2 ? ` · ${p.superficie_m2} m²` : ''}
+                  </p>
+                  <div className="flex items-center justify-between">
+                    <span className="font-semibold">{formatearCentavos(p.precio)}</span>
+                    <Badge
+                      variant="outline"
+                      className={COLOR_POR_ESTADO[p.estado_disponibilidad ?? ''] ?? ''}
+                    >
+                      {p.estado_disponibilidad ?? 'sin estado'}
+                    </Badge>
+                  </div>
+                </div>
+              </Card>
             </Link>
           ))}
         </div>
@@ -151,8 +171,8 @@ export function PropiedadesListado({ propiedades }: { propiedades: Propiedad[] }
               key={p.id}
               href={`/propiedades/${p.id}`}
               title={`${p.titulo} — ${p.estado_disponibilidad ?? 'sin estado'}`}
-              className={`flex aspect-square flex-col items-center justify-center rounded border p-1 text-center text-[10px] leading-tight ${
-                COLOR_POR_ESTADO[p.estado_disponibilidad ?? ''] ?? 'bg-gray-100 text-gray-700'
+              className={`flex aspect-square flex-col items-center justify-center rounded-lg border p-1 text-center text-[10px] leading-tight transition-transform hover:scale-105 ${
+                COLOR_POR_ESTADO[p.estado_disponibilidad ?? ''] ?? 'bg-muted text-muted-foreground'
               }`}
             >
               {p.lote_id ?? p.titulo.slice(0, 8)}

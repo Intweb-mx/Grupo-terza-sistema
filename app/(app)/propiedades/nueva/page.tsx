@@ -5,12 +5,14 @@ import { ROLES_CON_PERMISO_ESCRITURA } from '@/components/propiedades/constantes
 
 export default async function NuevaPropiedadPage() {
   const usuario = await getUsuarioActual()
-  if (!usuario) redirect('/login')
-  if (!ROLES_CON_PERMISO_ESCRITURA.includes(usuario.rol)) redirect('/propiedades')
+  if (!usuario || !ROLES_CON_PERMISO_ESCRITURA.includes(usuario.rol)) redirect('/propiedades')
 
   return (
     <div className="space-y-6">
-      <h1 className="text-xl font-semibold">Nueva propiedad</h1>
+      <div>
+        <h1 className="text-2xl font-semibold tracking-tight">Nueva propiedad</h1>
+        <p className="text-sm text-muted-foreground">Dar de alta un inmueble en el catálogo</p>
+      </div>
       <PropiedadForm />
     </div>
   )

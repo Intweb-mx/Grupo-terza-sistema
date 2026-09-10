@@ -2,6 +2,14 @@
 
 import { useRouter } from 'next/navigation'
 import { useState, type FormEvent } from 'react'
+import { AlertCircle } from 'lucide-react'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Textarea } from '@/components/ui/textarea'
+import { Alert, AlertDescription } from '@/components/ui/alert'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { Card, CardContent } from '@/components/ui/card'
 import { TIPOS_PROPIEDAD } from './constantes'
 
 type PropiedadFormValues = {
@@ -90,120 +98,105 @@ export function PropiedadForm({
   }
 
   return (
-    <form onSubmit={handleSubmit} className="max-w-lg space-y-4">
-      <div className="space-y-1">
-        <label htmlFor="titulo" className="text-sm font-medium">
-          Título
-        </label>
-        <input
-          id="titulo"
-          required
-          value={valores.titulo}
-          onChange={(e) => actualizar('titulo', e.target.value)}
-          className="w-full rounded border px-3 py-2"
-        />
-      </div>
+    <Card className="max-w-lg">
+      <CardContent>
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="space-y-1.5">
+            <Label htmlFor="titulo">Título</Label>
+            <Input
+              id="titulo"
+              required
+              value={valores.titulo}
+              onChange={(e) => actualizar('titulo', e.target.value)}
+            />
+          </div>
 
-      <div className="grid grid-cols-2 gap-4">
-        <div className="space-y-1">
-          <label htmlFor="tipo" className="text-sm font-medium">
-            Tipo
-          </label>
-          <select
-            id="tipo"
-            value={valores.tipo}
-            onChange={(e) => actualizar('tipo', e.target.value)}
-            className="w-full rounded border px-3 py-2"
-          >
-            {TIPOS_PROPIEDAD.map((t) => (
-              <option key={t} value={t}>
-                {t}
-              </option>
-            ))}
-          </select>
-        </div>
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-1.5">
+              <Label htmlFor="tipo">Tipo</Label>
+              <Select value={valores.tipo} onValueChange={(v) => actualizar('tipo', v)}>
+                <SelectTrigger id="tipo" className="w-full">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {TIPOS_PROPIEDAD.map((t) => (
+                    <SelectItem key={t} value={t}>
+                      {t}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
 
-        <div className="space-y-1">
-          <label htmlFor="ciudad" className="text-sm font-medium">
-            Ciudad
-          </label>
-          <input
-            id="ciudad"
-            required
-            value={valores.ciudad}
-            onChange={(e) => actualizar('ciudad', e.target.value)}
-            className="w-full rounded border px-3 py-2"
-          />
-        </div>
-      </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="ciudad">Ciudad</Label>
+              <Input
+                id="ciudad"
+                required
+                value={valores.ciudad}
+                onChange={(e) => actualizar('ciudad', e.target.value)}
+              />
+            </div>
+          </div>
 
-      <div className="grid grid-cols-2 gap-4">
-        <div className="space-y-1">
-          <label htmlFor="precio" className="text-sm font-medium">
-            Precio (MXN)
-          </label>
-          <input
-            id="precio"
-            type="number"
-            step="0.01"
-            min="0"
-            required
-            value={valores.precio}
-            onChange={(e) => actualizar('precio', e.target.value)}
-            className="w-full rounded border px-3 py-2"
-          />
-        </div>
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-1.5">
+              <Label htmlFor="precio">Precio (MXN)</Label>
+              <Input
+                id="precio"
+                type="number"
+                step="0.01"
+                min="0"
+                required
+                value={valores.precio}
+                onChange={(e) => actualizar('precio', e.target.value)}
+              />
+            </div>
 
-        <div className="space-y-1">
-          <label htmlFor="superficie_m2" className="text-sm font-medium">
-            Superficie (m²)
-          </label>
-          <input
-            id="superficie_m2"
-            type="number"
-            step="0.01"
-            min="0"
-            value={valores.superficie_m2}
-            onChange={(e) => actualizar('superficie_m2', e.target.value)}
-            className="w-full rounded border px-3 py-2"
-          />
-        </div>
-      </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="superficie_m2">Superficie (m²)</Label>
+              <Input
+                id="superficie_m2"
+                type="number"
+                step="0.01"
+                min="0"
+                value={valores.superficie_m2}
+                onChange={(e) => actualizar('superficie_m2', e.target.value)}
+              />
+            </div>
+          </div>
 
-      <div className="space-y-1">
-        <label htmlFor="direccion" className="text-sm font-medium">
-          Dirección
-        </label>
-        <input
-          id="direccion"
-          value={valores.direccion}
-          onChange={(e) => actualizar('direccion', e.target.value)}
-          className="w-full rounded border px-3 py-2"
-        />
-      </div>
+          <div className="space-y-1.5">
+            <Label htmlFor="direccion">Dirección</Label>
+            <Input
+              id="direccion"
+              value={valores.direccion}
+              onChange={(e) => actualizar('direccion', e.target.value)}
+            />
+          </div>
 
-      <div className="space-y-1">
-        <label htmlFor="descripcion" className="text-sm font-medium">
-          Descripción
-        </label>
-        <textarea
-          id="descripcion"
-          rows={4}
-          value={valores.descripcion}
-          onChange={(e) => actualizar('descripcion', e.target.value)}
-          className="w-full rounded border px-3 py-2"
-        />
-      </div>
+          <div className="space-y-1.5">
+            <Label htmlFor="descripcion">Descripción</Label>
+            <Textarea
+              id="descripcion"
+              rows={4}
+              value={valores.descripcion}
+              onChange={(e) => actualizar('descripcion', e.target.value)}
+            />
+          </div>
 
-      {error && <p className="text-sm text-red-600">{error}</p>}
+          {error && (
+            <Alert variant="destructive">
+              <AlertCircle className="size-4" />
+              <AlertDescription>{error}</AlertDescription>
+            </Alert>
+          )}
 
-      <button
-        type="submit"
-        disabled={guardando}
-        className="rounded bg-black px-4 py-2 text-sm text-white disabled:opacity-50"
-      >
-        {guardando ? 'Guardando…' : esEdicion ? 'Guardar cambios' : 'Crear propiedad'}
-      </button>
-    </form>
+          <Button type="submit" disabled={guardando}>
+            {guardando ? 'Guardando…' : esEdicion ? 'Guardar cambios' : 'Crear propiedad'}
+          </Button>
+        </form>
+      </CardContent>
+    </Card>
   )
 }
