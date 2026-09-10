@@ -130,6 +130,19 @@ Estas reglas no tienen excepción. Si algo parece contradecirlas, preguntar ante
 
 Este contrato se define antes de implementar. Cualquier cambio requiere actualizar este archivo y avisar al otro integrante.
 
+### Usuarios
+
+No hay signup público. Las cuentas se crean por invitación — solo `dueno` y
+`administrador` pueden invitar. El invitado recibe un email (vía Supabase Auth)
+con link para fijar su contraseña.
+
+```
+POST /api/usuarios/invitar
+     ← { nombre, email, rol: "dueno" | "socio" | "administrador" | "asesor" | "contador" }
+     → { id, email, invitado_en }
+     Solo dueno/administrador — 403 si no.
+```
+
 ### Propiedades
 
 ```

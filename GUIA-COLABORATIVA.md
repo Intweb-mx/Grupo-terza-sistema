@@ -245,6 +245,11 @@ create trigger on_auth_user_created
 
 **RLS en usuarios:**
 
+⚠️ Ojo: una policy sobre `usuarios` que hace `select ... from usuarios` dentro de
+sí misma causa recursión infinita en Postgres (`infinite recursion detected in
+policy for relation "usuarios"`). Se resuelve con una función `security
+definer`, que corre con privilegios propios y no vuelve a disparar la RLS:
+
 ```sql
 alter table public.usuarios enable row level security;
 
@@ -252,10 +257,26 @@ alter table public.usuarios enable row level security;
 create policy "Ver propio perfil" on public.usuarios
   for select using (auth.uid() = id);
 
+-- Función security definer: evita la recursión de la policy de abajo
+create or replace function public.usuario_rol_actual()
+returns text
+language sql security definer
+set search_path = public
+stable
+as $$
+  select rol from public.usuarios where id = auth.uid();
+$$;
+
 -- Dueño y administrador ven todos
 create policy "Admin ve todos" on public.usuarios
   for select using (
-    exists (select 1 from public.usuarios where id = auth.uid() and rol in ('dueno','administrador'))
+    public.usuario_rol_actual() in ('dueno','administrador')
+  );
+
+-- Dueño y administrador pueden editar usuarios existentes (rol, activo)
+create policy "Admin edita usuarios" on public.usuarios
+  for update using (
+    public.usuario_rol_actual() in ('dueno','administrador')
   );
 ```
 
@@ -279,6 +300,47 @@ export async function getUsuarioActual() {
 ```
 GET /api/auth/me
 → { id, nombre, email, rol, activo } | null
+```
+
+**Cuentas por invitación — no hay signup público**
+
+Los roles del sistema son personal interno (dueño, socio, administrador,
+asesor, contador), no clientes. Dejar un formulario de registro abierto
+significaría que cualquiera con el link crea una cuenta con acceso a datos
+de clientes y contratos. En vez de eso: solo dueño/administrador invita, y
+el invitado recibe un email para fijar su contraseña.
+
+Cliente admin de Supabase (`lib/supabase/admin.ts`) — usa
+`SUPABASE_SERVICE_ROLE_KEY`, solo se importa desde código de servidor.
+Requiere el paquete `server-only` (`npm install server-only`) para que el
+build falle si algo lo importa desde un componente cliente:
+
+```typescript
+import 'server-only'
+import { createClient } from '@supabase/supabase-js'
+import type { Database } from '@/types/supabase'
+
+export function createAdminClient() {
+  return createClient<Database>(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!,
+    { auth: { autoRefreshToken: false, persistSession: false } }
+  )
+}
+```
+
+**Server Action** (`lib/server/usuarios.ts`) — valida que quien invita sea
+dueño/administrador, después llama a `admin.auth.admin.inviteUserByEmail()`.
+El trigger `on_auth_user_created` de arriba se encarga de crear la fila en
+`public.usuarios` con el rol que se pasó en `data`.
+
+⚡ **Definir contrato con Frontend:**
+
+```
+POST /api/usuarios/invitar
+← { nombre, email, rol }
+→ { id, email, invitado_en }
+Solo dueno/administrador — 403 si no.
 ```
 
 ### F — Frontend auth
@@ -308,10 +370,19 @@ export const config = {
 - Renderizar navegación según rol
 - Redirect a `/login` si no hay sesión
 
+**Invitar usuarios** (solo visible para dueño/administrador):
+- Formulario en el dashboard (nombre, email, rol) → llama a `POST /api/usuarios/invitar`
+- `app/completar-registro/page.tsx` — el link del email de invitación cae acá;
+  usa `supabase.auth.updateUser({ password })` para que el invitado fije su
+  contraseña, después redirige a `/dashboard`
+
 ✅ **Fase 2 terminada cuando:**
 - Login funciona y redirige al dashboard
 - Ruta protegida sin sesión redirige a `/login`
 - Usuario con rol `asesor` no ve rutas de `contador`
+- No existe ninguna página de registro público — la única forma de crear
+  cuenta es que dueño/administrador invite desde el dashboard
+- Invitado recibe el email, fija su contraseña y entra con el rol asignado
 - `npm run verify` pasa
 
 ---
