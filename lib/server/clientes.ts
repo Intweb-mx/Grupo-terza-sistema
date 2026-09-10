@@ -78,15 +78,18 @@ export async function obtenerSaldo(clienteId: string) {
     return { saldo_pendiente: 0, dias_atraso: 0, penalizacion_aplicada: 0, proxima_fecha_corte: null }
   }
 
+  // 'reestructurado' queda fuera: son cuotas viejas ya reemplazadas por un
+  // calendario nuevo tras una reestructura — contarlas duplicaría el saldo.
   const { data: cuotas, error } = await supabase
     .from('amortizaciones')
-    .select('fecha_corte, total, estado')
+    .select('fecha_corte, total, estado, penalizacion')
     .eq('contrato_id', contrato.id)
-    .neq('estado', 'pagado')
+    .in('estado', ['pendiente', 'vencido'])
     .order('fecha_corte', { ascending: true })
   if (error) throw error
 
   const saldoPendiente = cuotas.reduce((suma, cuota) => suma + cuota.total, 0)
+  const penalizacionAplicada = cuotas.reduce((suma, cuota) => suma + cuota.penalizacion, 0)
   const proximaCuota = cuotas[0] ?? null
 
   let diasAtraso = 0
@@ -99,8 +102,7 @@ export async function obtenerSaldo(clienteId: string) {
   return {
     saldo_pendiente: saldoPendiente,
     dias_atraso: diasAtraso,
-    // penalizacion_aplicada depende de la tabla penalizaciones (fase 6)
-    penalizacion_aplicada: 0,
+    penalizacion_aplicada: penalizacionAplicada,
     proxima_fecha_corte: proximaCuota?.fecha_corte ?? null,
   }
 }

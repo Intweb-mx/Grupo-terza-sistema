@@ -188,7 +188,22 @@ POST /api/pagos
      → { id, saldo_restante, created_at }
 
 POST /api/clientes/:id/reestructura
-     → { nuevo_calendario: [...], fecha_aplicacion, interes_aplicado }
+     → { nuevo_calendario: [...], fecha_aplicacion, interes_aplicado, cuotas_generadas }
+     Solo dueno/administrador. Rechaza si el plazo del contrato no venció
+     todavía (regla de negocio: reestructura solo procede al vencer el
+     plazo con saldo insoluto).
+```
+
+### Cron interno (no es parte del API pública)
+
+```
+POST /api/cron/penalizaciones
+     Header: x-cron-secret: <CRON_SECRET>
+     → { revisadas, penalizaciones_aplicadas }
+     Disparado diario por un scheduler externo (Vercel Cron / GitHub
+     Action), no por un usuario — se autentica con CRON_SECRET, no con
+     sesión. Aplica $300 MXN a las cuotas que llegan exactamente a 3 días
+     de atraso. Idempotente (no duplica si corre dos veces el mismo día).
 ```
 
 ### Contratos
