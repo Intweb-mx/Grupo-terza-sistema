@@ -239,14 +239,30 @@ PUT  /api/prospectos/:id/etapa
 
 ### Contabilidad
 
+Gastos fijos se reparten entre proyectos activos en proporción a los
+ingresos de cada uno respecto al total del negocio (regla de negocio #4) —
+no en partes iguales, no sobre ingresos totales.
+
+CFDI: sin PAC conectado todavía (Facturama/SW Sapien/Diverza pendiente de
+elegir). `lib/server/cfdi.ts` tiene la interfaz lista (`emitirCfdi`,
+`cancelarCfdi`) pero lanza error hasta que se configure un proveedor.
+
 ```
 GET  /api/contabilidad/proyectos/:id/estado
      → { ingresos, gastos_fijos, gastos_variables, utilidad_bruta, utilidad_neta }
 
-GET  /api/contabilidad/flujo-proyectado
+GET  /api/contabilidad/movimientos
+     → [{ id, proyecto_id, tipo, categoria, descripcion, monto, fecha, referencia, cfdi_uuid, cfdi_estado }]
+     Filtrable por ?proyecto_id=
+
+POST /api/contabilidad/movimientos
+     ← { proyecto_id, tipo: "ingreso" | "egreso", categoria, descripcion, monto, fecha, referencia }
+     → { id, created_at }
+
+GET  /api/contabilidad/flujo-proyectado          — fase 9
      → [{ mes, ingresos_esperados, egresos_esperados, saldo_proyectado }]
 
-GET  /api/reportes/cartera-vencida
+GET  /api/reportes/cartera-vencida               — fase 9
      → [{ cliente_id, nombre, dias_atraso, monto_vencido, penalizacion_aplicada }]
 ```
 
