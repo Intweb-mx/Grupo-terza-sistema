@@ -4,8 +4,10 @@ import { obtenerCliente, obtenerAmortizacion, obtenerSaldo } from '@/lib/server/
 import { listarPropiedades } from '@/lib/server/propiedades'
 import { getUsuarioActual } from '@/lib/server/auth'
 import { formatearCentavos } from '@/lib/utils/moneda'
-import { ROLES_GESTION_COMERCIAL } from '@/lib/utils/roles'
+import { ROLES_GESTION_COMERCIAL, ROLES_GESTION_PAGOS, ROLES_REESTRUCTURA } from '@/lib/utils/roles'
 import { CalendarioAmortizacion } from '@/components/cartera/CalendarioAmortizacion'
+import { RegistrarPagoModal } from '@/components/cartera/RegistrarPagoModal'
+import { ReestructurarBoton } from '@/components/cartera/ReestructurarBoton'
 
 const COLOR_POR_ESTADO_CONTRATO: Record<string, string> = {
   borrador: 'bg-gray-100 text-gray-700 border-gray-300',
@@ -34,6 +36,8 @@ export default async function ClienteDetallePage({
   if (!cliente) notFound()
 
   const puedeEditar = ROLES_GESTION_COMERCIAL.includes(usuario.rol)
+  const puedeRegistrarPago = ROLES_GESTION_PAGOS.includes(usuario.rol)
+  const puedeReestructurar = ROLES_REESTRUCTURA.includes(usuario.rol)
   const tituloPropiedad = (propiedadId: string) =>
     propiedades.find((p) => p.id === propiedadId)?.titulo ?? propiedadId
 
@@ -91,7 +95,17 @@ export default async function ClienteDetallePage({
       </div>
 
       <div>
-        <h2 className="mb-2 font-medium">Calendario de amortización</h2>
+        <div className="mb-2 flex items-center justify-between">
+          <h2 className="font-medium">Calendario de amortización</h2>
+          <div className="flex gap-2">
+            {puedeReestructurar && cuotas.length > 0 && (
+              <ReestructurarBoton clienteId={cliente.id} />
+            )}
+            {puedeRegistrarPago && cuotas.length > 0 && (
+              <RegistrarPagoModal clienteId={cliente.id} />
+            )}
+          </div>
+        </div>
         <CalendarioAmortizacion cuotas={cuotas} saldo={saldo} />
       </div>
     </div>
