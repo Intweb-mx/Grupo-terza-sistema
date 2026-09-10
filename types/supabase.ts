@@ -78,6 +78,105 @@ export type Database = {
           },
         ]
       }
+      clientes: {
+        Row: {
+          apellidos: string
+          ciudad: string | null
+          created_at: string | null
+          direccion: string | null
+          email: string | null
+          id: string
+          nombre: string
+          rfc: string | null
+          telefono: string | null
+        }
+        Insert: {
+          apellidos: string
+          ciudad?: string | null
+          created_at?: string | null
+          direccion?: string | null
+          email?: string | null
+          id?: string
+          nombre: string
+          rfc?: string | null
+          telefono?: string | null
+        }
+        Update: {
+          apellidos?: string
+          ciudad?: string | null
+          created_at?: string | null
+          direccion?: string | null
+          email?: string | null
+          id?: string
+          nombre?: string
+          rfc?: string | null
+          telefono?: string | null
+        }
+        Relationships: []
+      }
+      contratos: {
+        Row: {
+          cliente_id: string
+          created_at: string | null
+          enganche: number | null
+          estado: string | null
+          fecha_fin: string | null
+          fecha_inicio: string
+          id: string
+          monto_total: number
+          notas: string | null
+          plazo_meses: number | null
+          propiedad_id: string
+          tipo: string
+          updated_at: string | null
+        }
+        Insert: {
+          cliente_id: string
+          created_at?: string | null
+          enganche?: number | null
+          estado?: string | null
+          fecha_fin?: string | null
+          fecha_inicio: string
+          id?: string
+          monto_total: number
+          notas?: string | null
+          plazo_meses?: number | null
+          propiedad_id: string
+          tipo: string
+          updated_at?: string | null
+        }
+        Update: {
+          cliente_id?: string
+          created_at?: string | null
+          enganche?: number | null
+          estado?: string | null
+          fecha_fin?: string | null
+          fecha_inicio?: string
+          id?: string
+          monto_total?: number
+          notas?: string | null
+          plazo_meses?: number | null
+          propiedad_id?: string
+          tipo?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "contratos_cliente_id_fkey"
+            columns: ["cliente_id"]
+            isOneToOne: false
+            referencedRelation: "clientes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "contratos_propiedad_id_fkey"
+            columns: ["propiedad_id"]
+            isOneToOne: false
+            referencedRelation: "propiedades"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       propiedades: {
         Row: {
           ciudad: string
