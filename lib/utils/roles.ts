@@ -1,3 +1,5 @@
 export const ROLES_GESTION_COMERCIAL = ['dueno', 'administrador', 'asesor']
 export const ROLES_GESTION_PAGOS = ['dueno', 'administrador', 'asesor', 'contador']
 export const ROLES_REESTRUCTURA = ['dueno', 'administrador']
+export const ROLES_VER_CONTABILIDAD = ['dueno', 'administrador', 'contador', 'socio']
+export const ROLES_GESTION_CONTABILIDAD = ['dueno', 'administrador', 'contador']
