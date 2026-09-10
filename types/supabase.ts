@@ -139,6 +139,7 @@ export type Database = {
           nombre: string
           rfc: string | null
           telefono: string | null
+          user_id: string | null
         }
         Insert: {
           apellidos: string
@@ -150,6 +151,7 @@ export type Database = {
           nombre: string
           rfc?: string | null
           telefono?: string | null
+          user_id?: string | null
         }
         Update: {
           apellidos?: string
@@ -161,6 +163,7 @@ export type Database = {
           nombre?: string
           rfc?: string | null
           telefono?: string | null
+          user_id?: string | null
         }
         Relationships: []
       }
