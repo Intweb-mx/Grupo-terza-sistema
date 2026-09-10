@@ -227,6 +227,106 @@ export type Database = {
           },
         ]
       }
+      pagos: {
+        Row: {
+          amortizacion_id: string | null
+          cliente_id: string
+          contrato_id: string
+          created_at: string | null
+          fecha: string
+          id: string
+          metodo_pago: string | null
+          monto: number
+          referencia: string | null
+          registrado_por: string | null
+        }
+        Insert: {
+          amortizacion_id?: string | null
+          cliente_id: string
+          contrato_id: string
+          created_at?: string | null
+          fecha: string
+          id?: string
+          metodo_pago?: string | null
+          monto: number
+          referencia?: string | null
+          registrado_por?: string | null
+        }
+        Update: {
+          amortizacion_id?: string | null
+          cliente_id?: string
+          contrato_id?: string
+          created_at?: string | null
+          fecha?: string
+          id?: string
+          metodo_pago?: string | null
+          monto?: number
+          referencia?: string | null
+          registrado_por?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pagos_amortizacion_id_fkey"
+            columns: ["amortizacion_id"]
+            isOneToOne: false
+            referencedRelation: "amortizaciones"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pagos_cliente_id_fkey"
+            columns: ["cliente_id"]
+            isOneToOne: false
+            referencedRelation: "clientes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pagos_contrato_id_fkey"
+            columns: ["contrato_id"]
+            isOneToOne: false
+            referencedRelation: "contratos"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pagos_registrado_por_fkey"
+            columns: ["registrado_por"]
+            isOneToOne: false
+            referencedRelation: "usuarios"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      penalizaciones: {
+        Row: {
+          amortizacion_id: string
+          created_at: string | null
+          fecha_aplicacion: string
+          id: string
+          monto: number
+        }
+        Insert: {
+          amortizacion_id: string
+          created_at?: string | null
+          fecha_aplicacion: string
+          id?: string
+          monto?: number
+        }
+        Update: {
+          amortizacion_id?: string
+          created_at?: string | null
+          fecha_aplicacion?: string
+          id?: string
+          monto?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "penalizaciones_amortizacion_id_fkey"
+            columns: ["amortizacion_id"]
+            isOneToOne: false
+            referencedRelation: "amortizaciones"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       propiedades: {
         Row: {
           ciudad: string
