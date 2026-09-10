@@ -78,6 +78,60 @@ export type Database = {
           },
         ]
       }
+      propiedades: {
+        Row: {
+          ciudad: string
+          created_at: string | null
+          descripcion: string | null
+          direccion: string | null
+          estado_disponibilidad: string | null
+          galeria: string[] | null
+          id: string
+          imagen_url: string | null
+          lote_id: string | null
+          precio: number
+          proyecto_id: string | null
+          superficie_m2: number | null
+          tipo: string
+          titulo: string
+          updated_at: string | null
+        }
+        Insert: {
+          ciudad: string
+          created_at?: string | null
+          descripcion?: string | null
+          direccion?: string | null
+          estado_disponibilidad?: string | null
+          galeria?: string[] | null
+          id?: string
+          imagen_url?: string | null
+          lote_id?: string | null
+          precio: number
+          proyecto_id?: string | null
+          superficie_m2?: number | null
+          tipo: string
+          titulo: string
+          updated_at?: string | null
+        }
+        Update: {
+          ciudad?: string
+          created_at?: string | null
+          descripcion?: string | null
+          direccion?: string | null
+          estado_disponibilidad?: string | null
+          galeria?: string[] | null
+          id?: string
+          imagen_url?: string | null
+          lote_id?: string | null
+          precio?: number
+          proyecto_id?: string | null
+          superficie_m2?: number | null
+          tipo?: string
+          titulo?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       usuarios: {
         Row: {
           activo: boolean | null
