@@ -22,6 +22,7 @@ const NAV_POR_ROL: Record<string, { href: string; label: string }[]> = {
     { href: '/clientes', label: 'Cartera' },
     { href: '/contratos/nuevo', label: 'Nuevo contrato' },
     { href: '/prospectos', label: 'CRM' },
+    { href: '/contabilidad', label: 'Contabilidad' },
     { href: '/dashboard/usuarios', label: 'Usuarios' },
   ],
   asesor: [
