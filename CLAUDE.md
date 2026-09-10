@@ -165,7 +165,17 @@ PUT  /api/propiedades/:id
 
 ```
 GET  /api/clientes
-     → [{ id, nombre, lote_id, propiedad_id, saldo_pendiente, proxima_fecha_corte, estado_pago }]
+     → [{ id, nombre, apellidos, lote_id, propiedad_id, saldo_pendiente, proxima_fecha_corte, estado_pago }]
+     saldo_pendiente, proxima_fecha_corte y estado_pago son null hasta fase 5
+     (dependen de la tabla amortizaciones, que todavía no existe)
+
+GET  /api/clientes/:id
+     → { id, nombre, apellidos, email, telefono, rfc, direccion, ciudad,
+          contratos: [{ id, tipo, propiedad_id, fecha_inicio, fecha_fin, monto_total, estado }] }
+
+POST /api/clientes
+     ← { nombre, apellidos, email, telefono, rfc, direccion, ciudad }
+     → { id, created_at }
 
 GET  /api/clientes/:id/amortizacion
      → [{ numero_pago, fecha_corte, capital, interes, penalizacion, total, estado, fecha_pago_real }]
