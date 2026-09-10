@@ -55,7 +55,15 @@ export function CalendarioAmortizacion({
           <p className="text-xs text-gray-500">Próxima fecha de corte</p>
           <p className="font-semibold">{saldo.proxima_fecha_corte ?? '—'}</p>
           {saldo.dias_atraso > 0 && (
-            <p className="text-xs text-red-600">{saldo.dias_atraso} días de atraso</p>
+            <span
+              className={`mt-1 inline-block rounded border px-2 py-0.5 text-xs ${
+                saldo.dias_atraso > 3
+                  ? 'border-red-300 bg-red-100 text-red-800'
+                  : 'border-amber-300 bg-amber-100 text-amber-800'
+              }`}
+            >
+              {saldo.dias_atraso} días de atraso
+            </span>
           )}
         </div>
       </div>
