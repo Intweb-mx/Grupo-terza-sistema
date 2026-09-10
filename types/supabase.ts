@@ -34,6 +34,56 @@ export type Database = {
   }
   public: {
     Tables: {
+      amortizaciones: {
+        Row: {
+          capital: number
+          contrato_id: string
+          created_at: string | null
+          estado: string | null
+          fecha_corte: string
+          fecha_pago_real: string | null
+          id: string
+          interes: number
+          numero_pago: number
+          penalizacion: number
+          total: number
+        }
+        Insert: {
+          capital: number
+          contrato_id: string
+          created_at?: string | null
+          estado?: string | null
+          fecha_corte: string
+          fecha_pago_real?: string | null
+          id?: string
+          interes?: number
+          numero_pago: number
+          penalizacion?: number
+          total: number
+        }
+        Update: {
+          capital?: number
+          contrato_id?: string
+          created_at?: string | null
+          estado?: string | null
+          fecha_corte?: string
+          fecha_pago_real?: string | null
+          id?: string
+          interes?: number
+          numero_pago?: number
+          penalizacion?: number
+          total?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "amortizaciones_contrato_id_fkey"
+            columns: ["contrato_id"]
+            isOneToOne: false
+            referencedRelation: "contratos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       audit_log: {
         Row: {
           accion: string
