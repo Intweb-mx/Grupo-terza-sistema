@@ -8,6 +8,7 @@ import { ROLES_GESTION_COMERCIAL, ROLES_GESTION_PAGOS, ROLES_REESTRUCTURA } from
 import { CalendarioAmortizacion } from '@/components/cartera/CalendarioAmortizacion'
 import { RegistrarPagoModal } from '@/components/cartera/RegistrarPagoModal'
 import { ReestructurarBoton } from '@/components/cartera/ReestructurarBoton'
+import { InvitarPortalBoton } from '@/components/cartera/InvitarPortalBoton'
 
 const COLOR_POR_ESTADO_CONTRATO: Record<string, string> = {
   borrador: 'bg-gray-100 text-gray-700 border-gray-300',
@@ -43,14 +44,17 @@ export default async function ClienteDetallePage({
 
   return (
     <div className="max-w-3xl space-y-6">
-      <div>
-        <h1 className="text-xl font-semibold">
-          {cliente.nombre} {cliente.apellidos}
-        </h1>
-        <p className="text-sm text-gray-500">
-          {[cliente.email, cliente.telefono, cliente.ciudad].filter(Boolean).join(' · ') ||
-            'Sin datos de contacto'}
-        </p>
+      <div className="flex items-start justify-between">
+        <div>
+          <h1 className="text-xl font-semibold">
+            {cliente.nombre} {cliente.apellidos}
+          </h1>
+          <p className="text-sm text-gray-500">
+            {[cliente.email, cliente.telefono, cliente.ciudad].filter(Boolean).join(' · ') ||
+              'Sin datos de contacto'}
+          </p>
+        </div>
+        {puedeReestructurar && cliente.email && <InvitarPortalBoton clienteId={cliente.id} />}
       </div>
 
       <div>
