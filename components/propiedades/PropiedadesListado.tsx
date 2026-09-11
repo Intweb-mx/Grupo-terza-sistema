@@ -175,19 +175,50 @@ export function PropiedadesListado({ propiedades }: { propiedades: Propiedad[] }
           ))}
         </div>
       ) : (
-        <div className="grid grid-cols-4 gap-2 sm:grid-cols-6 md:grid-cols-8">
-          {filtradas.map((p) => (
-            <Link
-              key={p.id}
-              href={`/propiedades/${p.id}`}
-              title={`${p.titulo} — ${p.estado_disponibilidad ?? 'sin estado'}`}
-              className={`flex aspect-square flex-col items-center justify-center rounded-lg border p-1 text-center text-[10px] leading-tight transition-transform hover:scale-105 ${
-                COLOR_POR_ESTADO[p.estado_disponibilidad ?? ''] ?? 'bg-muted text-muted-foreground'
-              }`}
-            >
-              {p.lote_id ?? p.titulo.slice(0, 8)}
-            </Link>
-          ))}
+        <div className="space-y-3">
+          <Card className="overflow-hidden p-0">
+            <div className="flex items-center justify-between gap-2 border-b border-white/50 px-4 py-3">
+              <div>
+                <p className="text-sm font-medium">Chihuahua, Chihuahua</p>
+                <p className="text-xs text-muted-foreground">
+                  Ubicación de referencia para la zona de operación
+                </p>
+              </div>
+              <a
+                href="https://www.google.com/maps/search/?api=1&query=Chihuahua,+Chihuahua,+M%C3%A9xico"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-xs font-medium text-primary hover:underline"
+              >
+                Abrir en Maps
+              </a>
+            </div>
+            <iframe
+              title="Mapa de Chihuahua, Chihuahua"
+              src="https://www.google.com/maps?q=Chihuahua,+Chihuahua,+M%C3%A9xico&output=embed"
+              className="h-[420px] w-full border-0"
+              loading="lazy"
+              referrerPolicy="no-referrer-when-downgrade"
+            />
+          </Card>
+          <p className="text-xs text-muted-foreground">
+            Vista de demostración. La vinculación de cada propiedad a su ubicación exacta en el mapa se
+            agregará más adelante.
+          </p>
+          <div className="grid grid-cols-4 gap-2 sm:grid-cols-6 md:grid-cols-8">
+            {filtradas.map((p) => (
+              <Link
+                key={p.id}
+                href={`/propiedades/${p.id}`}
+                title={`${p.titulo} — ${p.estado_disponibilidad ?? 'sin estado'}`}
+                className={`flex aspect-square flex-col items-center justify-center rounded-lg border p-1 text-center text-[10px] leading-tight transition-transform hover:scale-105 ${
+                  COLOR_POR_ESTADO[p.estado_disponibilidad ?? ''] ?? 'bg-muted text-muted-foreground'
+                }`}
+              >
+                {p.lote_id ?? p.titulo.slice(0, 8)}
+              </Link>
+            ))}
+          </div>
         </div>
       )}
     </div>
