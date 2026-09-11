@@ -913,6 +913,44 @@ GET /api/portal/estado-cuenta  → PDF generado en servidor
 
 ---
 
+## Backlog continuo (después de las 10 fases)
+
+Con las fases cerradas, el trabajo no termina — pero ya no hay un orden B→F fijo
+por fase. Cada tarea nueva que aparezca (bug, mejora, gap encontrado) se agrega
+acá con su dueño y si bloquea al otro o no.
+
+**Cómo decidir si algo bloquea (⚡) o es paralelo:**
+
+```
+⚡ Bloquea al otro lado — B primero, F después:
+   - Necesita un endpoint/tabla que todavía no existe
+   - Cambia el contrato de un endpoint que el otro ya está consumiendo
+
+Paralelo — cualquiera arranca cuando quiera:
+   - Solo toca archivos del propio territorio
+     (B: /lib/server, /app/api, /supabase/migrations)
+     (F: /app/*/page.tsx, /components)
+   - El contrato ya existe, o no requiere contrato en absoluto
+```
+
+Si no estás seguro, preguntá: "¿esto necesita algo que el otro tiene que crear
+primero?" — si no, es paralelo.
+
+| # | Tarea | Dueño | ⚡ Depende de | Estado |
+|---|-------|-------|--------------|--------|
+| 1 | Elegir librería PDF para `GET /api/portal/estado-cuenta` | B | — | Pendiente |
+| 2 | Elegir PAC de CFDI (Facturama/SW Sapien/Diverza) y conectar `lib/server/cfdi.ts` | B | — | Pendiente |
+| 3 | `CRON_SECRET` en Vercel + scheduler diario para `/api/cron/penalizaciones` | B (infra) | — | Pendiente |
+| 4 | Elegir proveedor de recordatorio (email/SMS/WhatsApp) para regla #3 | B | — | Pendiente |
+| 5 | `loading.tsx` en las páginas con datos (`/dashboard`, `/propiedades`, `/clientes`, etc.) | F | — | Pendiente |
+| 6 | Auditar que la navegación use `next/link` y no `<a>` (prefetch automático) | F | — | Pendiente |
+| 7 | Revisar que `PageTransition`/animaciones no agreguen delay perceptible | F | — | Pendiente |
+
+Actualizar esta tabla cada vez que se descubra o cierre algo — es el
+checklist vivo del proyecto una vez que las fases numeradas ya cerraron.
+
+---
+
 ## Flujo diario para los dos
 
 ```
