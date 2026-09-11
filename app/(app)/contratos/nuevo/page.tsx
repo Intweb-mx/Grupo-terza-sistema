@@ -11,8 +11,7 @@ export default async function NuevoContratoPage({
   searchParams: Promise<{ cliente_id?: string }>
 }) {
   const usuario = await getUsuarioActual()
-  if (!usuario) redirect('/login')
-  if (!ROLES_GESTION_COMERCIAL.includes(usuario.rol)) redirect('/clientes')
+  if (!usuario || !ROLES_GESTION_COMERCIAL.includes(usuario.rol)) redirect('/clientes')
 
   const { cliente_id } = await searchParams
   const [clientes, propiedades] = await Promise.all([listarClientes(), listarPropiedades()])
@@ -20,7 +19,10 @@ export default async function NuevoContratoPage({
 
   return (
     <div className="space-y-6">
-      <h1 className="text-xl font-semibold">Nuevo contrato</h1>
+      <div>
+        <h1 className="text-2xl font-semibold tracking-tight">Nuevo contrato</h1>
+        <p className="text-sm text-muted-foreground">Compraventa, arrendamiento o renta temporal</p>
+      </div>
       <ContratoWizard
         clientes={clientes}
         propiedades={propiedadesDisponibles}
