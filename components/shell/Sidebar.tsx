@@ -5,7 +5,7 @@ import { usePathname } from 'next/navigation'
 import { cn } from '@/lib/utils'
 import { Badge } from '@/components/ui/badge'
 import { SignOutButton } from './SignOutButton'
-import type { NavItem } from './nav-config'
+import { NAV_POR_ROL } from './nav-config'
 
 const ETIQUETA_ROL: Record<string, string> = {
   dueno: 'Dueño',
@@ -21,15 +21,14 @@ function esActivo(pathname: string, href: string) {
 }
 
 export function Sidebar({
-  nav,
   nombre,
   rol,
 }: {
-  nav: NavItem[]
   nombre: string
   rol: string
 }) {
   const pathname = usePathname()
+  const nav = NAV_POR_ROL[rol] ?? []
 
   return (
     <aside className="hidden w-64 shrink-0 flex-col border-r bg-card md:flex">

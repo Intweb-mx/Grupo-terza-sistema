@@ -12,10 +12,11 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { Button } from '@/components/ui/button'
 import { SignOutButton } from './SignOutButton'
-import type { NavItem } from './nav-config'
+import { NAV_POR_ROL } from './nav-config'
 
-export function MobileNav({ nav, nombre }: { nav: NavItem[]; nombre: string }) {
+export function MobileNav({ rol, nombre }: { rol: string; nombre: string }) {
   const pathname = usePathname()
+  const nav = NAV_POR_ROL[rol] ?? []
   const actual = nav.find(
     (item) => pathname === item.href || pathname.startsWith(`${item.href}/`)
   )
