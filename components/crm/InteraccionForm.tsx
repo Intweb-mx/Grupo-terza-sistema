@@ -2,6 +2,14 @@
 
 import { useRouter } from 'next/navigation'
 import { useState, type FormEvent } from 'react'
+import { toast } from 'sonner'
+import { AlertCircle } from 'lucide-react'
+import { Button } from '@/components/ui/button'
+import { Label } from '@/components/ui/label'
+import { Textarea } from '@/components/ui/textarea'
+import { Alert, AlertDescription } from '@/components/ui/alert'
+import { Card, CardContent } from '@/components/ui/card'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 
 const TIPOS = ['llamada', 'visita', 'whatsapp', 'email', 'reunion'] as const
 
@@ -10,13 +18,11 @@ export function InteraccionForm({ prospectoId }: { prospectoId: string }) {
   const [tipo, setTipo] = useState<(typeof TIPOS)[number]>('llamada')
   const [notas, setNotas] = useState('')
   const [error, setError] = useState<string | null>(null)
-  const [mensajeOk, setMensajeOk] = useState(false)
   const [guardando, setGuardando] = useState(false)
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
     setError(null)
-    setMensajeOk(false)
     setGuardando(true)
 
     const res = await fetch(`/api/prospectos/${prospectoId}/interaccion`, {
@@ -33,55 +39,47 @@ export function InteraccionForm({ prospectoId }: { prospectoId: string }) {
     }
 
     setNotas('')
-    setMensajeOk(true)
+    toast.success('Interacción registrada')
     router.refresh()
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-3 rounded border p-4">
-      <div className="grid grid-cols-2 gap-3">
-        <div className="space-y-1">
-          <label htmlFor="tipo" className="text-sm font-medium">
-            Tipo
-          </label>
-          <select
-            id="tipo"
-            value={tipo}
-            onChange={(e) => setTipo(e.target.value as (typeof TIPOS)[number])}
-            className="w-full rounded border px-3 py-2"
-          >
-            {TIPOS.map((t) => (
-              <option key={t} value={t}>
-                {t}
-              </option>
-            ))}
-          </select>
-        </div>
-      </div>
+    <Card>
+      <CardContent>
+        <form onSubmit={handleSubmit} className="space-y-3">
+          <div className="space-y-1.5">
+            <Label htmlFor="tipo">Tipo</Label>
+            <Select value={tipo} onValueChange={(v) => setTipo(v as (typeof TIPOS)[number])}>
+              <SelectTrigger id="tipo" className="w-full">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {TIPOS.map((t) => (
+                  <SelectItem key={t} value={t}>
+                    {t}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
 
-      <div className="space-y-1">
-        <label htmlFor="notas" className="text-sm font-medium">
-          Notas
-        </label>
-        <textarea
-          id="notas"
-          rows={3}
-          value={notas}
-          onChange={(e) => setNotas(e.target.value)}
-          className="w-full rounded border px-3 py-2"
-        />
-      </div>
+          <div className="space-y-1.5">
+            <Label htmlFor="notas">Notas</Label>
+            <Textarea id="notas" rows={3} value={notas} onChange={(e) => setNotas(e.target.value)} />
+          </div>
 
-      {error && <p className="text-sm text-red-600">{error}</p>}
-      {mensajeOk && <p className="text-sm text-green-700">Interacción registrada.</p>}
+          {error && (
+            <Alert variant="destructive">
+              <AlertCircle className="size-4" />
+              <AlertDescription>{error}</AlertDescription>
+            </Alert>
+          )}
 
-      <button
-        type="submit"
-        disabled={guardando}
-        className="rounded bg-black px-4 py-2 text-sm text-white disabled:opacity-50"
-      >
-        {guardando ? 'Guardando…' : 'Registrar interacción'}
-      </button>
-    </form>
+          <Button type="submit" disabled={guardando}>
+            {guardando ? 'Guardando…' : 'Registrar interacción'}
+          </Button>
+        </form>
+      </CardContent>
+    </Card>
   )
 }

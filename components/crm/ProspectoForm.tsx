@@ -2,6 +2,13 @@
 
 import { useRouter } from 'next/navigation'
 import { useState, type FormEvent } from 'react'
+import { AlertCircle } from 'lucide-react'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Alert, AlertDescription } from '@/components/ui/alert'
+import { Card, CardContent } from '@/components/ui/card'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { FUENTES } from './constantes'
 
 export function ProspectoForm() {
@@ -43,86 +50,77 @@ export function ProspectoForm() {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="max-w-lg space-y-4">
-      <div className="space-y-1">
-        <label htmlFor="nombre" className="text-sm font-medium">
-          Nombre
-        </label>
-        <input
-          id="nombre"
-          required
-          value={nombre}
-          onChange={(e) => setNombre(e.target.value)}
-          className="w-full rounded border px-3 py-2"
-        />
-      </div>
+    <Card className="max-w-lg">
+      <CardContent>
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="space-y-1.5">
+            <Label htmlFor="nombre">Nombre</Label>
+            <Input
+              id="nombre"
+              required
+              value={nombre}
+              onChange={(e) => setNombre(e.target.value)}
+            />
+          </div>
 
-      <div className="grid grid-cols-2 gap-4">
-        <div className="space-y-1">
-          <label htmlFor="telefono" className="text-sm font-medium">
-            Teléfono
-          </label>
-          <input
-            id="telefono"
-            value={telefono}
-            onChange={(e) => setTelefono(e.target.value)}
-            className="w-full rounded border px-3 py-2"
-          />
-        </div>
-        <div className="space-y-1">
-          <label htmlFor="email" className="text-sm font-medium">
-            Correo
-          </label>
-          <input
-            id="email"
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            className="w-full rounded border px-3 py-2"
-          />
-        </div>
-      </div>
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-1.5">
+              <Label htmlFor="telefono">Teléfono</Label>
+              <Input
+                id="telefono"
+                value={telefono}
+                onChange={(e) => setTelefono(e.target.value)}
+              />
+            </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="email">Correo</Label>
+              <Input
+                id="email"
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+              />
+            </div>
+          </div>
 
-      <div className="space-y-1">
-        <label htmlFor="interes" className="text-sm font-medium">
-          Interés
-        </label>
-        <input
-          id="interes"
-          value={interes}
-          onChange={(e) => setInteres(e.target.value)}
-          placeholder="Ej. casa en CDMX, 2-3 recámaras"
-          className="w-full rounded border px-3 py-2"
-        />
-      </div>
+          <div className="space-y-1.5">
+            <Label htmlFor="interes">Interés</Label>
+            <Input
+              id="interes"
+              value={interes}
+              onChange={(e) => setInteres(e.target.value)}
+              placeholder="Ej. casa en CDMX, 2-3 recámaras"
+            />
+          </div>
 
-      <div className="space-y-1">
-        <label htmlFor="fuente" className="text-sm font-medium">
-          Fuente
-        </label>
-        <select
-          id="fuente"
-          value={fuente}
-          onChange={(e) => setFuente(e.target.value as (typeof FUENTES)[number])}
-          className="w-full rounded border px-3 py-2"
-        >
-          {FUENTES.map((f) => (
-            <option key={f} value={f}>
-              {f}
-            </option>
-          ))}
-        </select>
-      </div>
+          <div className="space-y-1.5">
+            <Label htmlFor="fuente">Fuente</Label>
+            <Select value={fuente} onValueChange={(v) => setFuente(v as (typeof FUENTES)[number])}>
+              <SelectTrigger id="fuente" className="w-full">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {FUENTES.map((f) => (
+                  <SelectItem key={f} value={f}>
+                    {f}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
 
-      {error && <p className="text-sm text-red-600">{error}</p>}
+          {error && (
+            <Alert variant="destructive">
+              <AlertCircle className="size-4" />
+              <AlertDescription>{error}</AlertDescription>
+            </Alert>
+          )}
 
-      <button
-        type="submit"
-        disabled={guardando}
-        className="rounded bg-black px-4 py-2 text-sm text-white disabled:opacity-50"
-      >
-        {guardando ? 'Guardando…' : 'Crear prospecto'}
-      </button>
-    </form>
+          <Button type="submit" disabled={guardando}>
+            {guardando ? 'Guardando…' : 'Crear prospecto'}
+          </Button>
+        </form>
+      </CardContent>
+    </Card>
   )
 }

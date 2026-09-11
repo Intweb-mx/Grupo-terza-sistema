@@ -1,7 +1,7 @@
 import Link from 'next/link'
-import { redirect } from 'next/navigation'
+import { Plus } from 'lucide-react'
 import { listarProspectos } from '@/lib/server/prospectos'
-import { getUsuarioActual } from '@/lib/server/auth'
+import { Button } from '@/components/ui/button'
 import { KanbanProspectos } from '@/components/crm/KanbanProspectos'
 
 export default async function ProspectosPage({
@@ -9,9 +9,6 @@ export default async function ProspectosPage({
 }: {
   searchParams: Promise<{ fuente?: string }>
 }) {
-  const usuario = await getUsuarioActual()
-  if (!usuario) redirect('/login')
-
   const { fuente } = await searchParams
   const prospectos = await listarProspectos({ fuente })
 
@@ -19,12 +16,17 @@ export default async function ProspectosPage({
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-xl font-semibold">CRM · Prospectos</h1>
-          <p className="text-sm text-gray-500">Arrastrá una tarjeta para cambiar su etapa.</p>
+          <h1 className="text-2xl font-semibold tracking-tight">CRM · Prospectos</h1>
+          <p className="text-sm text-muted-foreground">
+            Arrastrá una tarjeta para cambiar su etapa
+          </p>
         </div>
-        <Link href="/prospectos/nuevo" className="rounded bg-black px-3 py-1.5 text-sm text-white">
-          Nuevo prospecto
-        </Link>
+        <Button asChild>
+          <Link href="/prospectos/nuevo">
+            <Plus className="size-4" />
+            Nuevo prospecto
+          </Link>
+        </Button>
       </div>
 
       <KanbanProspectos prospectos={prospectos} />
