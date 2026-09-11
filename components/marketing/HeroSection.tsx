@@ -1,26 +1,16 @@
-// Hero de landing: video de fondo a pantalla completa, navbar en píldoras
-// flotantes, titular gigante escalonado, bloques de estadísticas con
-// divisores diagonales. Basado en la referencia "securify" (skill
-// saas-video-hero) — layout fijo, contenido adaptado a Grupo Terza.
+// Hero de landing: emblema de la marca animándose de fondo a pantalla
+// completa, navbar en píldoras flotantes, titular gigante escalonado,
+// bloques de estadísticas con divisores diagonales. Layout basado en la
+// referencia "securify" (skill saas-video-hero), adaptado a Grupo Terza.
 
 import type { FC } from 'react'
 import Link from 'next/link'
+import { LogoMark } from './LogoMark'
 
-type NavLink = { label: string; href: string }
 type Stat = { value: string; label: string; align: 'left' | 'right' }
 
 const config = {
   brand: 'terza',
-  // Placeholder genérico (video de la skill) — reemplazar por metraje propio
-  // de propiedades/desarrollos cuando haya uno disponible.
-  videoSrc:
-    'https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260418_063509_7d167302-4fd4-480b-8260-18ab572333d4.mp4',
-  navLinks: [
-    { label: 'propiedades', href: '#propiedades' },
-    { label: 'cartera', href: '#cartera' },
-    { label: 'contratos', href: '#contratos' },
-    { label: 'contacto', href: '#contacto' },
-  ] satisfies NavLink[],
   ctaLabel: 'iniciar sesión',
   ctaHref: '/login',
   headline: ['controla', 'tu', 'cartera'] as [string, string, string],
@@ -32,40 +22,16 @@ const config = {
   statBottomRight: { value: '+40', label: 'asesores conectados', align: 'right' } as Stat,
 }
 
-const Logo: FC = () => (
-  <svg viewBox="0 0 256 256" className="h-5 w-5" aria-hidden="true">
-    <path
-      fill="#ffffff"
-      d="M 128 192 L 128 256 L 64.5 256 L 32 223 L 0 192 L 0 128 L 64 128 Z
-         M 256 192 L 256 256 L 192.5 256 L 160 223 L 128 192 L 128 128 L 192 128 Z
-         M 128 64 L 128 128 L 64.5 128 L 32 95 L 0 64 L 0 0 L 64 0 Z
-         M 256 64 L 256 128 L 192.5 128 L 160 95 L 128 64 L 128 0 L 192 0 Z"
-    />
-  </svg>
-)
-
 const Navbar: FC = () => (
   <nav className="absolute top-0 left-0 right-0 z-20 flex items-center justify-between gap-4 px-6 pt-6 md:px-10">
     <div className="flex items-center gap-2 rounded-full bg-neutral-900/90 py-3 pl-4 pr-6 backdrop-blur">
-      <Logo />
+      <LogoMark idPrefix="nav" className="h-6 w-6" />
       <span className="text-sm font-normal tracking-tight text-white">{config.brand}</span>
-    </div>
-
-    <div className="hidden items-center gap-1 rounded-full bg-neutral-900/90 px-3 py-2 backdrop-blur md:flex">
-      {config.navLinks.map((link) => (
-        <a
-          key={link.label}
-          href={link.href}
-          className="rounded-full px-5 py-2 text-sm text-neutral-300 transition-colors hover:text-white"
-        >
-          {link.label}
-        </a>
-      ))}
     </div>
 
     <Link
       href={config.ctaHref}
-      className="rounded-full bg-white px-6 py-3 text-sm font-normal text-black transition-colors hover:bg-neutral-200"
+      className="rounded-full bg-white px-8 py-4 text-base font-medium text-black transition-colors hover:bg-neutral-200"
     >
       {config.ctaLabel}
     </Link>
@@ -85,14 +51,9 @@ export const HeroSection: FC = () => {
 
   return (
     <section className="hero-font relative h-screen w-full overflow-hidden bg-black">
-      <video
-        className="absolute inset-0 h-full w-full object-cover"
-        src={config.videoSrc}
-        autoPlay
-        loop
-        muted
-        playsInline
-      />
+      <div className="absolute inset-0 flex items-center justify-center">
+        <LogoMark idPrefix="hero" animated className="h-[85vmin] w-[85vmin] opacity-90" />
+      </div>
 
       <Navbar />
 
