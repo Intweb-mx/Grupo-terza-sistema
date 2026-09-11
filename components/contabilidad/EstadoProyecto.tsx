@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { formatearCentavos } from '@/lib/utils/moneda'
+import { Card, CardContent } from '@/components/ui/card'
 
 type Estado = {
   ingresos: number
@@ -25,8 +26,8 @@ export function EstadoProyecto({ proyectoId }: { proyectoId: string }) {
       .catch(() => setError('No se pudo calcular el estado del proyecto'))
   }, [proyectoId])
 
-  if (error) return <p className="text-sm text-red-600">{error}</p>
-  if (!estado) return <p className="text-sm text-gray-500">Cargando…</p>
+  if (error) return <p className="text-sm text-destructive">{error}</p>
+  if (!estado) return <p className="text-sm text-muted-foreground">Cargando…</p>
 
   const filas: [string, number][] = [
     ['Ingresos', estado.ingresos],
@@ -37,15 +38,17 @@ export function EstadoProyecto({ proyectoId }: { proyectoId: string }) {
   ]
 
   return (
-    <div className="max-w-sm divide-y rounded border">
-      {filas.map(([label, monto]) => (
-        <div key={label} className="flex items-center justify-between px-4 py-3 text-sm">
-          <span className="text-gray-600">{label}</span>
-          <span className={`font-medium ${monto < 0 ? 'text-red-700' : ''}`}>
-            {formatearCentavos(monto)}
-          </span>
-        </div>
-      ))}
-    </div>
+    <Card className="max-w-sm py-0">
+      <CardContent className="divide-y px-0">
+        {filas.map(([label, monto]) => (
+          <div key={label} className="flex items-center justify-between px-4 py-3 text-sm">
+            <span className="text-muted-foreground">{label}</span>
+            <span className={`font-medium ${monto < 0 ? 'text-destructive' : ''}`}>
+              {formatearCentavos(monto)}
+            </span>
+          </div>
+        ))}
+      </CardContent>
+    </Card>
   )
 }
