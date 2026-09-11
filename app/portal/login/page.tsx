@@ -9,6 +9,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
+import { BackgroundMesh } from '@/components/shell/BackgroundMesh'
 
 export default function PortalLoginPage() {
   const router = useRouter()
@@ -41,6 +42,7 @@ export default function PortalLoginPage() {
 
   return (
     <main className="flex flex-1 items-center justify-center bg-muted/40 p-6">
+      <BackgroundMesh />
       <Card className="w-full max-w-sm">
         <CardHeader>
           <div className="mb-2 flex size-10 items-center justify-center rounded-lg bg-primary text-lg font-semibold text-primary-foreground">
