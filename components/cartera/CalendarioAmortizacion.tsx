@@ -1,4 +1,14 @@
 import { formatearCentavos } from '@/lib/utils/moneda'
+import { Badge } from '@/components/ui/badge'
+import { Card, CardContent } from '@/components/ui/card'
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table'
 
 type CuotaAmortizacion = {
   numero_pago: number
@@ -19,7 +29,7 @@ type Saldo = {
 }
 
 const COLOR_POR_ESTADO_CUOTA: Record<string, string> = {
-  pendiente: 'bg-gray-100 text-gray-700 border-gray-300',
+  pendiente: 'bg-muted text-muted-foreground border-border',
   pagado: 'bg-green-100 text-green-800 border-green-300',
   vencido: 'bg-red-100 text-red-800 border-red-300',
   reestructurado: 'bg-amber-100 text-amber-800 border-amber-300',
@@ -33,7 +43,7 @@ export function CalendarioAmortizacion({
   saldo: Saldo
 }) {
   if (cuotas.length === 0) {
-    return <p className="text-sm text-gray-500">Sin calendario de amortización.</p>
+    return <p className="text-sm text-muted-foreground">Sin calendario de amortización.</p>
   }
 
   const totalPagado = cuotas
@@ -42,69 +52,75 @@ export function CalendarioAmortizacion({
 
   return (
     <div className="space-y-4">
-      <div className="grid grid-cols-3 gap-4 rounded border p-4 text-sm">
-        <div>
-          <p className="text-xs text-gray-500">Total pagado</p>
-          <p className="font-semibold">{formatearCentavos(totalPagado)}</p>
-        </div>
-        <div>
-          <p className="text-xs text-gray-500">Saldo pendiente</p>
-          <p className="font-semibold">{formatearCentavos(saldo.saldo_pendiente)}</p>
-        </div>
-        <div>
-          <p className="text-xs text-gray-500">Próxima fecha de corte</p>
-          <p className="font-semibold">{saldo.proxima_fecha_corte ?? '—'}</p>
-          {saldo.dias_atraso > 0 && (
-            <span
-              className={`mt-1 inline-block rounded border px-2 py-0.5 text-xs ${
-                saldo.dias_atraso > 3
-                  ? 'border-red-300 bg-red-100 text-red-800'
-                  : 'border-amber-300 bg-amber-100 text-amber-800'
-              }`}
-            >
-              {saldo.dias_atraso} días de atraso
-            </span>
-          )}
-        </div>
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+        <Card>
+          <CardContent>
+            <p className="text-xs text-muted-foreground">Total pagado</p>
+            <p className="text-lg font-semibold">{formatearCentavos(totalPagado)}</p>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent>
+            <p className="text-xs text-muted-foreground">Saldo pendiente</p>
+            <p className="text-lg font-semibold">{formatearCentavos(saldo.saldo_pendiente)}</p>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent>
+            <p className="text-xs text-muted-foreground">Próxima fecha de corte</p>
+            <p className="text-lg font-semibold">{saldo.proxima_fecha_corte ?? '—'}</p>
+            {saldo.dias_atraso > 0 && (
+              <Badge
+                variant="outline"
+                className={`mt-1 ${
+                  saldo.dias_atraso > 3
+                    ? 'border-red-300 bg-red-100 text-red-800'
+                    : 'border-amber-300 bg-amber-100 text-amber-800'
+                }`}
+              >
+                {saldo.dias_atraso} días de atraso
+              </Badge>
+            )}
+          </CardContent>
+        </Card>
       </div>
 
-      <div className="overflow-x-auto rounded border">
-        <table className="w-full min-w-[640px] text-sm">
-          <thead className="bg-gray-50 text-left text-xs text-gray-500">
-            <tr>
-              <th className="px-3 py-2">#</th>
-              <th className="px-3 py-2">Corte</th>
-              <th className="px-3 py-2">Capital</th>
-              <th className="px-3 py-2">Interés</th>
-              <th className="px-3 py-2">Penalización</th>
-              <th className="px-3 py-2">Total</th>
-              <th className="px-3 py-2">Estado</th>
-              <th className="px-3 py-2">Pago real</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y">
+      <div className="overflow-x-auto rounded-lg border bg-card">
+        <Table className="min-w-[640px]">
+          <TableHeader>
+            <TableRow>
+              <TableHead>#</TableHead>
+              <TableHead>Corte</TableHead>
+              <TableHead>Capital</TableHead>
+              <TableHead>Interés</TableHead>
+              <TableHead>Penalización</TableHead>
+              <TableHead>Total</TableHead>
+              <TableHead>Estado</TableHead>
+              <TableHead>Pago real</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
             {cuotas.map((c) => (
-              <tr key={c.numero_pago}>
-                <td className="px-3 py-2">{c.numero_pago}</td>
-                <td className="px-3 py-2">{c.fecha_corte}</td>
-                <td className="px-3 py-2">{formatearCentavos(c.capital)}</td>
-                <td className="px-3 py-2">{formatearCentavos(c.interes)}</td>
-                <td className="px-3 py-2">{formatearCentavos(c.penalizacion)}</td>
-                <td className="px-3 py-2 font-medium">{formatearCentavos(c.total)}</td>
-                <td className="px-3 py-2">
-                  <span
-                    className={`rounded border px-2 py-0.5 text-xs ${
-                      COLOR_POR_ESTADO_CUOTA[c.estado ?? ''] ?? 'bg-gray-100 text-gray-700'
-                    }`}
+              <TableRow key={c.numero_pago}>
+                <TableCell>{c.numero_pago}</TableCell>
+                <TableCell>{c.fecha_corte}</TableCell>
+                <TableCell>{formatearCentavos(c.capital)}</TableCell>
+                <TableCell>{formatearCentavos(c.interes)}</TableCell>
+                <TableCell>{formatearCentavos(c.penalizacion)}</TableCell>
+                <TableCell className="font-medium">{formatearCentavos(c.total)}</TableCell>
+                <TableCell>
+                  <Badge
+                    variant="outline"
+                    className={COLOR_POR_ESTADO_CUOTA[c.estado ?? ''] ?? ''}
                   >
                     {c.estado ?? 'sin estado'}
-                  </span>
-                </td>
-                <td className="px-3 py-2">{c.fecha_pago_real ?? '—'}</td>
-              </tr>
+                  </Badge>
+                </TableCell>
+                <TableCell>{c.fecha_pago_real ?? '—'}</TableCell>
+              </TableRow>
             ))}
-          </tbody>
-        </table>
+          </TableBody>
+        </Table>
       </div>
     </div>
   )

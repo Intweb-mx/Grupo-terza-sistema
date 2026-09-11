@@ -2,7 +2,22 @@
 
 import { useMemo, useState, type FormEvent } from 'react'
 import { useRouter } from 'next/navigation'
+import { AlertCircle, Check } from 'lucide-react'
 import { formatearCentavos } from '@/lib/utils/moneda'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Textarea } from '@/components/ui/textarea'
+import { Alert, AlertDescription } from '@/components/ui/alert'
+import { Card, CardContent } from '@/components/ui/card'
+import { cn } from '@/lib/utils'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 
 type Cliente = { id: string; nombre: string; apellidos: string }
 type Propiedad = { id: string; titulo: string; ciudad: string; precio: number }
@@ -95,216 +110,199 @@ export function ContratoWizard({
   }
 
   return (
-    <div className="max-w-lg space-y-6">
-      <ol className="flex gap-2 text-xs text-gray-500">
-        {PASOS.map((label, i) => (
-          <li
-            key={label}
-            className={`rounded px-2 py-1 ${i === paso ? 'bg-gray-900 text-white' : 'bg-gray-100'}`}
-          >
-            {i + 1}. {label}
-          </li>
-        ))}
-      </ol>
-
-      <form onSubmit={handleSubmitPaso} className="space-y-4">
-        {paso === 0 && (
-          <div className="space-y-1">
-            <label htmlFor="cliente" className="text-sm font-medium">
-              Cliente
-            </label>
-            <select
-              id="cliente"
-              required
-              value={clienteId}
-              onChange={(e) => setClienteId(e.target.value)}
-              className="w-full rounded border px-3 py-2"
+    <Card className="max-w-lg">
+      <CardContent className="space-y-6">
+        <ol className="flex gap-2">
+          {PASOS.map((label, i) => (
+            <li
+              key={label}
+              className={cn(
+                'flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-medium',
+                i === paso
+                  ? 'bg-primary text-primary-foreground'
+                  : i < paso
+                    ? 'bg-primary/10 text-primary'
+                    : 'bg-muted text-muted-foreground'
+              )}
             >
-              <option value="">Elegí un cliente</option>
-              {clientes.map((c) => (
-                <option key={c.id} value={c.id}>
-                  {c.nombre} {c.apellidos}
-                </option>
-              ))}
-            </select>
-          </div>
-        )}
+              {i < paso ? <Check className="size-3" /> : `${i + 1}.`} {label}
+            </li>
+          ))}
+        </ol>
 
-        {paso === 1 && (
-          <div className="space-y-1">
-            <label htmlFor="propiedad" className="text-sm font-medium">
-              Propiedad disponible
-            </label>
-            <select
-              id="propiedad"
-              required
-              value={propiedadId}
-              onChange={(e) => setPropiedadId(e.target.value)}
-              className="w-full rounded border px-3 py-2"
-            >
-              <option value="">Elegí una propiedad</option>
-              {propiedades.map((p) => (
-                <option key={p.id} value={p.id}>
-                  {p.titulo} — {p.ciudad} ({formatearCentavos(p.precio)})
-                </option>
-              ))}
-            </select>
-            {propiedades.length === 0 && (
-              <p className="text-xs text-amber-600">No hay propiedades disponibles.</p>
-            )}
-          </div>
-        )}
-
-        {paso === 2 && (
-          <div className="space-y-4">
-            <div className="space-y-1">
-              <label htmlFor="tipo" className="text-sm font-medium">
-                Tipo de contrato
-              </label>
-              <select
-                id="tipo"
-                value={tipo}
-                onChange={(e) => setTipo(e.target.value as (typeof TIPOS_CONTRATO)[number])}
-                className="w-full rounded border px-3 py-2"
-              >
-                {TIPOS_CONTRATO.map((t) => (
-                  <option key={t} value={t}>
-                    {t}
-                  </option>
-                ))}
-              </select>
+        <form onSubmit={handleSubmitPaso} className="space-y-4">
+          {paso === 0 && (
+            <div className="space-y-1.5">
+              <Label htmlFor="cliente">Cliente</Label>
+              <Select value={clienteId} onValueChange={setClienteId}>
+                <SelectTrigger id="cliente" className="w-full">
+                  <SelectValue placeholder="Elegí un cliente" />
+                </SelectTrigger>
+                <SelectContent>
+                  {clientes.map((c) => (
+                    <SelectItem key={c.id} value={c.id}>
+                      {c.nombre} {c.apellidos}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
-
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-1">
-                <label htmlFor="fecha_inicio" className="text-sm font-medium">
-                  Fecha de inicio
-                </label>
-                <input
-                  id="fecha_inicio"
-                  type="date"
-                  required
-                  value={fechaInicio}
-                  onChange={(e) => setFechaInicio(e.target.value)}
-                  className="w-full rounded border px-3 py-2"
-                />
-              </div>
-              <div className="space-y-1">
-                <label htmlFor="plazo_meses" className="text-sm font-medium">
-                  Plazo (meses)
-                  {tipo === 'compraventa' && (
-                    <span className="ml-1 font-normal text-gray-400">
-                      requerido para generar el calendario
-                    </span>
-                  )}
-                </label>
-                <input
-                  id="plazo_meses"
-                  type="number"
-                  min="0"
-                  required={tipo === 'compraventa'}
-                  value={plazoMeses}
-                  onChange={(e) => setPlazoMeses(e.target.value)}
-                  className="w-full rounded border px-3 py-2"
-                />
-              </div>
-            </div>
-
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-1">
-                <label htmlFor="monto_total" className="text-sm font-medium">
-                  Monto total (MXN)
-                </label>
-                <input
-                  id="monto_total"
-                  type="number"
-                  step="0.01"
-                  min="0"
-                  required
-                  value={montoTotal}
-                  onChange={(e) => setMontoTotal(e.target.value)}
-                  className="w-full rounded border px-3 py-2"
-                />
-              </div>
-              <div className="space-y-1">
-                <label htmlFor="enganche" className="text-sm font-medium">
-                  Enganche (MXN)
-                </label>
-                <input
-                  id="enganche"
-                  type="number"
-                  step="0.01"
-                  min="0"
-                  value={enganche}
-                  onChange={(e) => setEnganche(e.target.value)}
-                  className="w-full rounded border px-3 py-2"
-                />
-              </div>
-            </div>
-
-            <div className="space-y-1">
-              <label htmlFor="notas" className="text-sm font-medium">
-                Notas
-              </label>
-              <textarea
-                id="notas"
-                rows={3}
-                value={notas}
-                onChange={(e) => setNotas(e.target.value)}
-                className="w-full rounded border px-3 py-2"
-              />
-            </div>
-          </div>
-        )}
-
-        {paso === 3 && (
-          <div className="space-y-2 rounded border p-4 text-sm">
-            <p>
-              <span className="text-gray-500">Cliente:</span> {cliente?.nombre} {cliente?.apellidos}
-            </p>
-            <p>
-              <span className="text-gray-500">Propiedad:</span> {propiedad?.titulo}
-            </p>
-            <p>
-              <span className="text-gray-500">Tipo:</span> {tipo}
-            </p>
-            <p>
-              <span className="text-gray-500">Inicio:</span> {fechaInicio}
-              {plazoMeses ? ` · ${plazoMeses} meses` : ''}
-            </p>
-            <p>
-              <span className="text-gray-500">Monto:</span>{' '}
-              {formatearCentavos(Math.round(Number(montoTotal || '0') * 100))}
-              {enganche ? ` (enganche ${formatearCentavos(Math.round(Number(enganche) * 100))})` : ''}
-            </p>
-          </div>
-        )}
-
-        {error && <p className="text-sm text-red-600">{error}</p>}
-
-        <div className="flex gap-2">
-          {paso > 0 && (
-            <button
-              type="button"
-              onClick={() => setPaso((p) => p - 1)}
-              className="rounded border px-4 py-2 text-sm"
-            >
-              Atrás
-            </button>
           )}
-          <button
-            type="submit"
-            disabled={!puedeAvanzar || guardando}
-            className="rounded bg-black px-4 py-2 text-sm text-white disabled:opacity-50"
-          >
-            {paso < PASOS.length - 1
-              ? 'Siguiente'
-              : guardando
-                ? 'Creando…'
-                : 'Crear contrato'}
-          </button>
-        </div>
-      </form>
-    </div>
+
+          {paso === 1 && (
+            <div className="space-y-1.5">
+              <Label htmlFor="propiedad">Propiedad disponible</Label>
+              <Select value={propiedadId} onValueChange={setPropiedadId}>
+                <SelectTrigger id="propiedad" className="w-full">
+                  <SelectValue placeholder="Elegí una propiedad" />
+                </SelectTrigger>
+                <SelectContent>
+                  {propiedades.map((p) => (
+                    <SelectItem key={p.id} value={p.id}>
+                      {p.titulo} — {p.ciudad} ({formatearCentavos(p.precio)})
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              {propiedades.length === 0 && (
+                <p className="text-xs text-amber-600">No hay propiedades disponibles.</p>
+              )}
+            </div>
+          )}
+
+          {paso === 2 && (
+            <div className="space-y-4">
+              <div className="space-y-1.5">
+                <Label htmlFor="tipo">Tipo de contrato</Label>
+                <Select
+                  value={tipo}
+                  onValueChange={(v) => setTipo(v as (typeof TIPOS_CONTRATO)[number])}
+                >
+                  <SelectTrigger id="tipo" className="w-full">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {TIPOS_CONTRATO.map((t) => (
+                      <SelectItem key={t} value={t}>
+                        {t}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-1.5">
+                  <Label htmlFor="fecha_inicio">Fecha de inicio</Label>
+                  <Input
+                    id="fecha_inicio"
+                    type="date"
+                    required
+                    value={fechaInicio}
+                    onChange={(e) => setFechaInicio(e.target.value)}
+                  />
+                </div>
+                <div className="space-y-1.5">
+                  <Label htmlFor="plazo_meses">
+                    Plazo (meses)
+                    {tipo === 'compraventa' && (
+                      <span className="font-normal text-muted-foreground"> · requerido</span>
+                    )}
+                  </Label>
+                  <Input
+                    id="plazo_meses"
+                    type="number"
+                    min="0"
+                    required={tipo === 'compraventa'}
+                    value={plazoMeses}
+                    onChange={(e) => setPlazoMeses(e.target.value)}
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-1.5">
+                  <Label htmlFor="monto_total">Monto total (MXN)</Label>
+                  <Input
+                    id="monto_total"
+                    type="number"
+                    step="0.01"
+                    min="0"
+                    required
+                    value={montoTotal}
+                    onChange={(e) => setMontoTotal(e.target.value)}
+                  />
+                </div>
+                <div className="space-y-1.5">
+                  <Label htmlFor="enganche">Enganche (MXN)</Label>
+                  <Input
+                    id="enganche"
+                    type="number"
+                    step="0.01"
+                    min="0"
+                    value={enganche}
+                    onChange={(e) => setEnganche(e.target.value)}
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-1.5">
+                <Label htmlFor="notas">Notas</Label>
+                <Textarea
+                  id="notas"
+                  rows={3}
+                  value={notas}
+                  onChange={(e) => setNotas(e.target.value)}
+                />
+              </div>
+            </div>
+          )}
+
+          {paso === 3 && (
+            <div className="space-y-2 rounded-lg border bg-muted/50 p-4 text-sm">
+              <p>
+                <span className="text-muted-foreground">Cliente:</span> {cliente?.nombre}{' '}
+                {cliente?.apellidos}
+              </p>
+              <p>
+                <span className="text-muted-foreground">Propiedad:</span> {propiedad?.titulo}
+              </p>
+              <p>
+                <span className="text-muted-foreground">Tipo:</span> {tipo}
+              </p>
+              <p>
+                <span className="text-muted-foreground">Inicio:</span> {fechaInicio}
+                {plazoMeses ? ` · ${plazoMeses} meses` : ''}
+              </p>
+              <p>
+                <span className="text-muted-foreground">Monto:</span>{' '}
+                {formatearCentavos(Math.round(Number(montoTotal || '0') * 100))}
+                {enganche
+                  ? ` (enganche ${formatearCentavos(Math.round(Number(enganche) * 100))})`
+                  : ''}
+              </p>
+            </div>
+          )}
+
+          {error && (
+            <Alert variant="destructive">
+              <AlertCircle className="size-4" />
+              <AlertDescription>{error}</AlertDescription>
+            </Alert>
+          )}
+
+          <div className="flex gap-2">
+            {paso > 0 && (
+              <Button type="button" variant="outline" onClick={() => setPaso((p) => p - 1)}>
+                Atrás
+              </Button>
+            )}
+            <Button type="submit" disabled={!puedeAvanzar || guardando}>
+              {paso < PASOS.length - 1 ? 'Siguiente' : guardando ? 'Creando…' : 'Crear contrato'}
+            </Button>
+          </div>
+        </form>
+      </CardContent>
+    </Card>
   )
 }

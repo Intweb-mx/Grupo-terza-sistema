@@ -1,13 +1,14 @@
 'use client'
 
 import { useState } from 'react'
+import { toast } from 'sonner'
+import { UserPlus } from 'lucide-react'
+import { Button } from '@/components/ui/button'
 
 export function InvitarPortalBoton({ clienteId }: { clienteId: string }) {
-  const [mensaje, setMensaje] = useState<{ tipo: 'ok' | 'error'; texto: string } | null>(null)
   const [enviando, setEnviando] = useState(false)
 
   async function invitar() {
-    setMensaje(null)
     setEnviando(true)
 
     const res = await fetch(`/api/clientes/${clienteId}/invitar`, { method: 'POST' })
@@ -16,28 +17,17 @@ export function InvitarPortalBoton({ clienteId }: { clienteId: string }) {
     setEnviando(false)
 
     if (!res.ok) {
-      setMensaje({ tipo: 'error', texto: data?.error ?? 'No se pudo invitar al cliente' })
+      toast.error(data?.error ?? 'No se pudo invitar al cliente')
       return
     }
 
-    setMensaje({ tipo: 'ok', texto: `Invitación enviada a ${data.email}` })
+    toast.success(`Invitación enviada a ${data.email}`)
   }
 
   return (
-    <div className="flex items-center gap-2">
-      <button
-        type="button"
-        onClick={invitar}
-        disabled={enviando}
-        className="rounded border px-3 py-1.5 text-sm disabled:opacity-50"
-      >
-        {enviando ? 'Enviando…' : 'Invitar al portal'}
-      </button>
-      {mensaje && (
-        <span className={`text-xs ${mensaje.tipo === 'ok' ? 'text-green-700' : 'text-red-600'}`}>
-          {mensaje.texto}
-        </span>
-      )}
-    </div>
+    <Button variant="outline" onClick={invitar} disabled={enviando}>
+      <UserPlus className="size-4" />
+      {enviando ? 'Enviando…' : 'Invitar al portal'}
+    </Button>
   )
 }

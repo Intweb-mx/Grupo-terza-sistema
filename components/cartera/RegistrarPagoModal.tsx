@@ -1,13 +1,34 @@
 'use client'
 
-import { useRef, useState, type FormEvent } from 'react'
+import { useState, type FormEvent } from 'react'
 import { useRouter } from 'next/navigation'
+import { toast } from 'sonner'
+import { AlertCircle } from 'lucide-react'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Alert, AlertDescription } from '@/components/ui/alert'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog'
 
 const METODOS_PAGO = ['efectivo', 'transferencia', 'cheque', 'tarjeta'] as const
 
 export function RegistrarPagoModal({ clienteId }: { clienteId: string }) {
   const router = useRouter()
-  const dialogRef = useRef<HTMLDialogElement>(null)
+  const [abierto, setAbierto] = useState(false)
 
   const [monto, setMonto] = useState('')
   const [fecha, setFecha] = useState(new Date().toISOString().slice(0, 10))
@@ -15,15 +36,6 @@ export function RegistrarPagoModal({ clienteId }: { clienteId: string }) {
   const [metodoPago, setMetodoPago] = useState<(typeof METODOS_PAGO)[number]>('transferencia')
   const [error, setError] = useState<string | null>(null)
   const [guardando, setGuardando] = useState(false)
-
-  function abrir() {
-    setError(null)
-    dialogRef.current?.showModal()
-  }
-
-  function cerrar() {
-    dialogRef.current?.close()
-  }
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
@@ -51,28 +63,25 @@ export function RegistrarPagoModal({ clienteId }: { clienteId: string }) {
 
     setMonto('')
     setReferencia('')
-    cerrar()
+    setAbierto(false)
+    toast.success('Pago registrado')
     router.refresh()
   }
 
   return (
-    <>
-      <button type="button" onClick={abrir} className="rounded bg-black px-3 py-1.5 text-sm text-white">
-        Registrar pago
-      </button>
-
-      <dialog
-        ref={dialogRef}
-        className="w-full max-w-sm rounded-lg border p-6 backdrop:bg-black/40"
-      >
+    <Dialog open={abierto} onOpenChange={setAbierto}>
+      <DialogTrigger asChild>
+        <Button onClick={() => setError(null)}>Registrar pago</Button>
+      </DialogTrigger>
+      <DialogContent>
         <form onSubmit={handleSubmit} className="space-y-4">
-          <h2 className="text-lg font-semibold">Registrar pago</h2>
+          <DialogHeader>
+            <DialogTitle>Registrar pago</DialogTitle>
+          </DialogHeader>
 
-          <div className="space-y-1">
-            <label htmlFor="monto" className="text-sm font-medium">
-              Monto (MXN)
-            </label>
-            <input
+          <div className="space-y-1.5">
+            <Label htmlFor="monto">Monto (MXN)</Label>
+            <Input
               id="monto"
               type="number"
               step="0.01"
@@ -80,70 +89,65 @@ export function RegistrarPagoModal({ clienteId }: { clienteId: string }) {
               required
               value={monto}
               onChange={(e) => setMonto(e.target.value)}
-              className="w-full rounded border px-3 py-2"
             />
           </div>
 
-          <div className="space-y-1">
-            <label htmlFor="fecha" className="text-sm font-medium">
-              Fecha
-            </label>
-            <input
+          <div className="space-y-1.5">
+            <Label htmlFor="fecha">Fecha</Label>
+            <Input
               id="fecha"
               type="date"
               required
               value={fecha}
               onChange={(e) => setFecha(e.target.value)}
-              className="w-full rounded border px-3 py-2"
             />
           </div>
 
-          <div className="space-y-1">
-            <label htmlFor="metodo_pago" className="text-sm font-medium">
-              Método de pago
-            </label>
-            <select
-              id="metodo_pago"
+          <div className="space-y-1.5">
+            <Label htmlFor="metodo_pago">Método de pago</Label>
+            <Select
               value={metodoPago}
-              onChange={(e) => setMetodoPago(e.target.value as (typeof METODOS_PAGO)[number])}
-              className="w-full rounded border px-3 py-2"
+              onValueChange={(v) => setMetodoPago(v as (typeof METODOS_PAGO)[number])}
             >
-              {METODOS_PAGO.map((m) => (
-                <option key={m} value={m}>
-                  {m}
-                </option>
-              ))}
-            </select>
+              <SelectTrigger id="metodo_pago" className="w-full">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {METODOS_PAGO.map((m) => (
+                  <SelectItem key={m} value={m}>
+                    {m}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
 
-          <div className="space-y-1">
-            <label htmlFor="referencia" className="text-sm font-medium">
-              Referencia
-            </label>
-            <input
+          <div className="space-y-1.5">
+            <Label htmlFor="referencia">Referencia</Label>
+            <Input
               id="referencia"
               value={referencia}
               onChange={(e) => setReferencia(e.target.value)}
-              className="w-full rounded border px-3 py-2"
             />
           </div>
 
-          {error && <p className="text-sm text-red-600">{error}</p>}
+          {error && (
+            <Alert variant="destructive">
+              <AlertCircle className="size-4" />
+              <AlertDescription>{error}</AlertDescription>
+            </Alert>
+          )}
 
-          <div className="flex justify-end gap-2">
-            <button type="button" onClick={cerrar} className="rounded border px-4 py-2 text-sm">
+          <DialogFooter>
+            <Button type="button" variant="outline" onClick={() => setAbierto(false)}>
               Cancelar
-            </button>
-            <button
-              type="submit"
-              disabled={guardando}
-              className="rounded bg-black px-4 py-2 text-sm text-white disabled:opacity-50"
-            >
+            </Button>
+            <Button type="submit" disabled={guardando}>
               {guardando ? 'Guardando…' : 'Registrar'}
-            </button>
-          </div>
+            </Button>
+          </DialogFooter>
         </form>
-      </dialog>
-    </>
+      </DialogContent>
+    </Dialog>
   )
 }

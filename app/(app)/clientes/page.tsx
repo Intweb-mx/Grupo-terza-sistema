@@ -1,25 +1,30 @@
 import Link from 'next/link'
-import { redirect } from 'next/navigation'
+import { Plus } from 'lucide-react'
 import { listarClientes } from '@/lib/server/clientes'
 import { getUsuarioActual } from '@/lib/server/auth'
+import { Button } from '@/components/ui/button'
 import { ClientesListado } from '@/components/cartera/ClientesListado'
 import { ROLES_GESTION_COMERCIAL } from '@/lib/utils/roles'
 
 export default async function ClientesPage() {
   const usuario = await getUsuarioActual()
-  if (!usuario) redirect('/login')
-
   const clientes = await listarClientes()
-  const puedeEditar = ROLES_GESTION_COMERCIAL.includes(usuario.rol)
+  const puedeEditar = ROLES_GESTION_COMERCIAL.includes(usuario?.rol ?? '')
 
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-xl font-semibold">Clientes</h1>
+        <div>
+          <h1 className="text-2xl font-semibold tracking-tight">Cartera de clientes</h1>
+          <p className="text-sm text-muted-foreground">Compradores y arrendatarios</p>
+        </div>
         {puedeEditar && (
-          <Link href="/clientes/nuevo" className="rounded bg-black px-3 py-1.5 text-sm text-white">
-            Nuevo cliente
-          </Link>
+          <Button asChild>
+            <Link href="/clientes/nuevo">
+              <Plus className="size-4" />
+              Nuevo cliente
+            </Link>
+          </Button>
         )}
       </div>
 
