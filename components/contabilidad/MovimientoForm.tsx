@@ -1,9 +1,40 @@
 'use client'
 
-import { useRef, useState, type FormEvent } from 'react'
+import { useState, type FormEvent } from 'react'
+import { toast } from 'sonner'
+import { AlertCircle } from 'lucide-react'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Alert, AlertDescription } from '@/components/ui/alert'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog'
 
-export function MovimientoForm({ onGuardado }: { onGuardado: () => void }) {
-  const dialogRef = useRef<HTMLDialogElement>(null)
+type Proyecto = { id: string; nombre: string }
+
+const SIN_PROYECTO = 'sin_proyecto'
+
+export function MovimientoForm({
+  onGuardado,
+  proyectos,
+}: {
+  onGuardado: () => void
+  proyectos: Proyecto[]
+}) {
+  const [abierto, setAbierto] = useState(false)
 
   const [tipo, setTipo] = useState<'ingreso' | 'egreso'>('ingreso')
   const [categoria, setCategoria] = useState('')
@@ -11,18 +42,9 @@ export function MovimientoForm({ onGuardado }: { onGuardado: () => void }) {
   const [monto, setMonto] = useState('')
   const [fecha, setFecha] = useState(new Date().toISOString().slice(0, 10))
   const [referencia, setReferencia] = useState('')
-  const [proyectoId, setProyectoId] = useState('')
+  const [proyectoId, setProyectoId] = useState(SIN_PROYECTO)
   const [error, setError] = useState<string | null>(null)
   const [guardando, setGuardando] = useState(false)
-
-  function abrir() {
-    setError(null)
-    dialogRef.current?.showModal()
-  }
-
-  function cerrar() {
-    dialogRef.current?.close()
-  }
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
@@ -33,7 +55,7 @@ export function MovimientoForm({ onGuardado }: { onGuardado: () => void }) {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        proyecto_id: proyectoId || undefined,
+        proyecto_id: proyectoId === SIN_PROYECTO ? undefined : proyectoId,
         tipo,
         categoria,
         descripcion: descripcion || undefined,
@@ -54,55 +76,50 @@ export function MovimientoForm({ onGuardado }: { onGuardado: () => void }) {
     setDescripcion('')
     setMonto('')
     setReferencia('')
-    setProyectoId('')
-    cerrar()
+    setProyectoId(SIN_PROYECTO)
+    setAbierto(false)
+    toast.success('Movimiento registrado')
     onGuardado()
   }
 
   return (
-    <>
-      <button type="button" onClick={abrir} className="rounded bg-black px-3 py-1.5 text-sm text-white">
-        Nuevo movimiento
-      </button>
-
-      <dialog ref={dialogRef} className="w-full max-w-sm rounded-lg border p-6 backdrop:bg-black/40">
+    <Dialog open={abierto} onOpenChange={setAbierto}>
+      <DialogTrigger asChild>
+        <Button onClick={() => setError(null)}>Nuevo movimiento</Button>
+      </DialogTrigger>
+      <DialogContent>
         <form onSubmit={handleSubmit} className="space-y-4">
-          <h2 className="text-lg font-semibold">Nuevo movimiento</h2>
+          <DialogHeader>
+            <DialogTitle>Nuevo movimiento</DialogTitle>
+          </DialogHeader>
 
-          <div className="space-y-1">
-            <label htmlFor="tipo" className="text-sm font-medium">
-              Tipo
-            </label>
-            <select
-              id="tipo"
-              value={tipo}
-              onChange={(e) => setTipo(e.target.value as 'ingreso' | 'egreso')}
-              className="w-full rounded border px-3 py-2"
-            >
-              <option value="ingreso">Ingreso</option>
-              <option value="egreso">Egreso</option>
-            </select>
+          <div className="space-y-1.5">
+            <Label htmlFor="tipo">Tipo</Label>
+            <Select value={tipo} onValueChange={(v) => setTipo(v as 'ingreso' | 'egreso')}>
+              <SelectTrigger id="tipo" className="w-full">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="ingreso">Ingreso</SelectItem>
+                <SelectItem value="egreso">Egreso</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
 
-          <div className="space-y-1">
-            <label htmlFor="categoria" className="text-sm font-medium">
-              Categoría
-            </label>
-            <input
+          <div className="space-y-1.5">
+            <Label htmlFor="categoria">Categoría</Label>
+            <Input
               id="categoria"
               required
               value={categoria}
               onChange={(e) => setCategoria(e.target.value)}
               placeholder="Ej. renta oficina, cobranza"
-              className="w-full rounded border px-3 py-2"
             />
           </div>
 
-          <div className="space-y-1">
-            <label htmlFor="monto" className="text-sm font-medium">
-              Monto (MXN)
-            </label>
-            <input
+          <div className="space-y-1.5">
+            <Label htmlFor="monto">Monto (MXN)</Label>
+            <Input
               id="monto"
               type="number"
               step="0.01"
@@ -110,79 +127,78 @@ export function MovimientoForm({ onGuardado }: { onGuardado: () => void }) {
               required
               value={monto}
               onChange={(e) => setMonto(e.target.value)}
-              className="w-full rounded border px-3 py-2"
             />
           </div>
 
-          <div className="space-y-1">
-            <label htmlFor="fecha" className="text-sm font-medium">
-              Fecha
-            </label>
-            <input
+          <div className="space-y-1.5">
+            <Label htmlFor="fecha">Fecha</Label>
+            <Input
               id="fecha"
               type="date"
               required
               value={fecha}
               onChange={(e) => setFecha(e.target.value)}
-              className="w-full rounded border px-3 py-2"
             />
           </div>
 
-          <div className="space-y-1">
-            <label htmlFor="proyecto_id" className="text-sm font-medium">
-              ID de proyecto
-              <span className="ml-1 font-normal text-gray-400">
-                opcional — dejar vacío para gasto fijo del negocio
+          <div className="space-y-1.5">
+            <Label htmlFor="proyecto_id">
+              Proyecto
+              <span className="font-normal text-muted-foreground">
+                {' '}
+                · dejar en blanco para gasto fijo del negocio
               </span>
-            </label>
-            <input
-              id="proyecto_id"
-              value={proyectoId}
-              onChange={(e) => setProyectoId(e.target.value)}
-              className="w-full rounded border px-3 py-2"
-            />
+            </Label>
+            <Select value={proyectoId} onValueChange={setProyectoId}>
+              <SelectTrigger id="proyecto_id" className="w-full">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value={SIN_PROYECTO}>Sin proyecto</SelectItem>
+                {proyectos.map((p) => (
+                  <SelectItem key={p.id} value={p.id}>
+                    {p.nombre}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
 
-          <div className="space-y-1">
-            <label htmlFor="descripcion" className="text-sm font-medium">
-              Descripción
-            </label>
-            <input
+          <div className="space-y-1.5">
+            <Label htmlFor="descripcion">Descripción</Label>
+            <Input
               id="descripcion"
               value={descripcion}
               onChange={(e) => setDescripcion(e.target.value)}
-              className="w-full rounded border px-3 py-2"
             />
           </div>
 
-          <div className="space-y-1">
-            <label htmlFor="referencia" className="text-sm font-medium">
-              Referencia
-            </label>
-            <input
+          <div className="space-y-1.5">
+            <Label htmlFor="referencia">Referencia</Label>
+            <Input
               id="referencia"
               value={referencia}
               onChange={(e) => setReferencia(e.target.value)}
-              className="w-full rounded border px-3 py-2"
             />
           </div>
 
-          {error && <p className="text-sm text-red-600">{error}</p>}
+          {error && (
+            <Alert variant="destructive">
+              <AlertCircle className="size-4" />
+              <AlertDescription>{error}</AlertDescription>
+            </Alert>
+          )}
 
-          <div className="flex justify-end gap-2">
-            <button type="button" onClick={cerrar} className="rounded border px-4 py-2 text-sm">
+          <DialogFooter>
+            <Button type="button" variant="outline" onClick={() => setAbierto(false)}>
               Cancelar
-            </button>
-            <button
-              type="submit"
-              disabled={guardando}
-              className="rounded bg-black px-4 py-2 text-sm text-white disabled:opacity-50"
-            >
+            </Button>
+            <Button type="submit" disabled={guardando}>
               {guardando ? 'Guardando…' : 'Registrar'}
-            </button>
-          </div>
+            </Button>
+          </DialogFooter>
         </form>
-      </dialog>
-    </>
+      </DialogContent>
+    </Dialog>
   )
 }

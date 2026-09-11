@@ -3,6 +3,22 @@
 import { useCallback, useEffect, useState } from 'react'
 import Link from 'next/link'
 import { formatearCentavos } from '@/lib/utils/moneda'
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table'
+import { Badge } from '@/components/ui/badge'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 
 type Movimiento = {
   id: string
@@ -17,15 +33,28 @@ type Movimiento = {
   cfdi_estado: string | null
 }
 
-export function MovimientosListado({ recargar }: { recargar: number }) {
-  const [proyectoId, setProyectoId] = useState('')
+type Proyecto = { id: string; nombre: string }
+
+const TODOS = 'todos'
+
+export function MovimientosListado({
+  recargar,
+  proyectos,
+}: {
+  recargar: number
+  proyectos: Proyecto[]
+}) {
+  const [proyectoId, setProyectoId] = useState(TODOS)
   const [movimientos, setMovimientos] = useState<Movimiento[] | null>(null)
   const [error, setError] = useState<string | null>(null)
 
+  const nombreProyecto = (id: string) => proyectos.find((p) => p.id === id)?.nombre ?? id.slice(0, 8)
+
   const cargar = useCallback(async () => {
-    const url = proyectoId
-      ? `/api/contabilidad/movimientos?proyecto_id=${proyectoId}`
-      : '/api/contabilidad/movimientos'
+    const url =
+      proyectoId === TODOS
+        ? '/api/contabilidad/movimientos'
+        : `/api/contabilidad/movimientos?proyecto_id=${proyectoId}`
     const res = await fetch(url)
     if (!res.ok) {
       setError('No se pudieron cargar los movimientos')
@@ -44,73 +73,79 @@ export function MovimientosListado({ recargar }: { recargar: number }) {
 
   return (
     <div className="space-y-4">
-      <div className="flex items-end gap-3">
-        <div>
-          <label className="block text-xs font-medium text-gray-500">
-            Filtrar por ID de proyecto
-          </label>
-          <input
-            value={proyectoId}
-            onChange={(e) => setProyectoId(e.target.value)}
-            placeholder="Todos los proyectos"
-            className="rounded border px-2 py-1 text-sm"
-          />
-        </div>
+      <div className="space-y-1.5">
+        <label className="text-xs font-medium text-muted-foreground">Proyecto</label>
+        <Select value={proyectoId} onValueChange={setProyectoId}>
+          <SelectTrigger size="sm" className="w-56">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value={TODOS}>Todos los proyectos</SelectItem>
+            {proyectos.map((p) => (
+              <SelectItem key={p.id} value={p.id}>
+                {p.nombre}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
       </div>
 
-      {error && <p className="text-sm text-red-600">{error}</p>}
+      {error && <p className="text-sm text-destructive">{error}</p>}
 
       {movimientos === null ? (
-        <p className="text-sm text-gray-500">Cargando…</p>
+        <p className="text-sm text-muted-foreground">Cargando…</p>
       ) : movimientos.length === 0 ? (
-        <p className="text-sm text-gray-500">Sin movimientos todavía.</p>
+        <p className="text-sm text-muted-foreground">Sin movimientos todavía.</p>
       ) : (
-        <div className="overflow-x-auto rounded border">
-          <table className="w-full min-w-[720px] text-sm">
-            <thead className="bg-gray-50 text-left text-xs text-gray-500">
-              <tr>
-                <th className="px-3 py-2">Fecha</th>
-                <th className="px-3 py-2">Tipo</th>
-                <th className="px-3 py-2">Categoría</th>
-                <th className="px-3 py-2">Descripción</th>
-                <th className="px-3 py-2">Monto</th>
-                <th className="px-3 py-2">Proyecto</th>
-                <th className="px-3 py-2">CFDI</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y">
+        <div className="overflow-x-auto rounded-lg border bg-card">
+          <Table className="min-w-[720px]">
+            <TableHeader>
+              <TableRow>
+                <TableHead>Fecha</TableHead>
+                <TableHead>Tipo</TableHead>
+                <TableHead>Categoría</TableHead>
+                <TableHead>Descripción</TableHead>
+                <TableHead>Monto</TableHead>
+                <TableHead>Proyecto</TableHead>
+                <TableHead>CFDI</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
               {movimientos.map((m) => (
-                <tr key={m.id}>
-                  <td className="px-3 py-2">{m.fecha}</td>
-                  <td className="px-3 py-2">
-                    <span
+                <TableRow key={m.id}>
+                  <TableCell>{m.fecha}</TableCell>
+                  <TableCell>
+                    <Badge
+                      variant="outline"
                       className={
-                        m.tipo === 'ingreso' ? 'text-green-700' : 'text-red-700'
+                        m.tipo === 'ingreso'
+                          ? 'border-green-300 bg-green-100 text-green-800'
+                          : 'border-red-300 bg-red-100 text-red-800'
                       }
                     >
                       {m.tipo}
-                    </span>
-                  </td>
-                  <td className="px-3 py-2">{m.categoria}</td>
-                  <td className="px-3 py-2">{m.descripcion ?? '—'}</td>
-                  <td className="px-3 py-2 font-medium">{formatearCentavos(m.monto)}</td>
-                  <td className="px-3 py-2">
+                    </Badge>
+                  </TableCell>
+                  <TableCell>{m.categoria}</TableCell>
+                  <TableCell>{m.descripcion ?? '—'}</TableCell>
+                  <TableCell className="font-medium">{formatearCentavos(m.monto)}</TableCell>
+                  <TableCell>
                     {m.proyecto_id ? (
                       <Link
                         href={`/contabilidad/proyectos/${m.proyecto_id}`}
-                        className="text-blue-600 hover:underline"
+                        className="text-primary hover:underline"
                       >
-                        {m.proyecto_id.slice(0, 8)}…
+                        {nombreProyecto(m.proyecto_id)}
                       </Link>
                     ) : (
                       '—'
                     )}
-                  </td>
-                  <td className="px-3 py-2">{m.cfdi_estado ?? 'sin timbrar'}</td>
-                </tr>
+                  </TableCell>
+                  <TableCell>{m.cfdi_estado ?? 'sin timbrar'}</TableCell>
+                </TableRow>
               ))}
-            </tbody>
-          </table>
+            </TableBody>
+          </Table>
         </div>
       )}
     </div>

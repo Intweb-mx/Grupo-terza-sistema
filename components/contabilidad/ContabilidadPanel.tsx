@@ -4,17 +4,25 @@ import { useState } from 'react'
 import { MovimientosListado } from './MovimientosListado'
 import { MovimientoForm } from './MovimientoForm'
 
-export function ContabilidadPanel({ puedeGestionar }: { puedeGestionar: boolean }) {
+type Proyecto = { id: string; nombre: string }
+
+export function ContabilidadPanel({
+  puedeGestionar,
+  proyectos,
+}: {
+  puedeGestionar: boolean
+  proyectos: Proyecto[]
+}) {
   const [recargar, setRecargar] = useState(0)
 
   return (
     <div className="space-y-4">
       {puedeGestionar && (
         <div className="flex justify-end">
-          <MovimientoForm onGuardado={() => setRecargar((n) => n + 1)} />
+          <MovimientoForm proyectos={proyectos} onGuardado={() => setRecargar((n) => n + 1)} />
         </div>
       )}
-      <MovimientosListado recargar={recargar} />
+      <MovimientosListado recargar={recargar} proyectos={proyectos} />
     </div>
   )
 }
