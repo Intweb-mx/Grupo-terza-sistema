@@ -2,6 +2,15 @@
 
 import { useState } from 'react'
 import { formatearCentavos } from '@/lib/utils/moneda'
+import { Button } from '@/components/ui/button'
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table'
 
 type FilaFlujo = {
   mes: string // YYYY-MM
@@ -20,7 +29,7 @@ export function FlujoProyectadoChart({ filas }: { filas: FilaFlujo[] }) {
   const [verTabla, setVerTabla] = useState(false)
 
   if (filas.length === 0) {
-    return <p className="text-sm text-gray-500">Sin cobros proyectados a futuro.</p>
+    return <p className="text-sm text-muted-foreground">Sin cobros proyectados a futuro.</p>
   }
 
   const max = Math.max(...filas.map((f) => f.ingresos_esperados))
@@ -28,45 +37,43 @@ export function FlujoProyectadoChart({ filas }: { filas: FilaFlujo[] }) {
   return (
     <div className="space-y-3">
       <div className="flex items-center justify-between">
-        <p className="text-xs text-gray-500">Cobro esperado por mes (próximas cuotas pendientes)</p>
-        <button
-          type="button"
-          onClick={() => setVerTabla((v) => !v)}
-          className="text-xs text-blue-600 hover:underline"
-        >
+        <p className="text-xs text-muted-foreground">
+          Cobro esperado por mes (próximas cuotas pendientes)
+        </p>
+        <Button variant="ghost" size="sm" onClick={() => setVerTabla((v) => !v)}>
           {verTabla ? 'Ver gráfica' : 'Ver tabla'}
-        </button>
+        </Button>
       </div>
 
       {verTabla ? (
-        <table className="w-full text-sm">
-          <thead className="text-left text-xs text-gray-500">
-            <tr>
-              <th className="py-1">Mes</th>
-              <th className="py-1">Ingresos esperados</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Mes</TableHead>
+              <TableHead>Ingresos esperados</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
             {filas.map((f) => (
-              <tr key={f.mes}>
-                <td className="py-1">{etiquetaMes(f.mes)}</td>
-                <td className="py-1">{formatearCentavos(f.ingresos_esperados)}</td>
-              </tr>
+              <TableRow key={f.mes}>
+                <TableCell>{etiquetaMes(f.mes)}</TableCell>
+                <TableCell>{formatearCentavos(f.ingresos_esperados)}</TableCell>
+              </TableRow>
             ))}
-          </tbody>
-        </table>
+          </TableBody>
+        </Table>
       ) : (
         <div className="flex h-40 gap-2">
           {filas.map((f) => (
             <div key={f.mes} className="flex h-full flex-1 flex-col items-center justify-end gap-1">
               <div
                 title={`${etiquetaMes(f.mes)}: ${formatearCentavos(f.ingresos_esperados)}`}
-                className="w-full rounded-t bg-blue-500"
+                className="w-full rounded-t bg-primary"
                 style={{
                   height: `${max > 0 ? Math.max(4, (f.ingresos_esperados / max) * 100) : 0}%`,
                 }}
               />
-              <span className="text-[10px] text-gray-500">{etiquetaMes(f.mes)}</span>
+              <span className="text-[10px] text-muted-foreground">{etiquetaMes(f.mes)}</span>
             </div>
           ))}
         </div>

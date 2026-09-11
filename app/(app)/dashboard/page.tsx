@@ -1,10 +1,14 @@
+import Link from 'next/link'
+import { ChevronRight } from 'lucide-react'
 import { getUsuarioActual } from '@/lib/server/auth'
 import { obtenerKpis, obtenerCarteraVencida, obtenerFlujoProyectado } from '@/lib/server/reportes'
 import { listarProspectos } from '@/lib/server/prospectos'
+import { listarProyectos } from '@/lib/server/contabilidad'
 import { KpiCards } from '@/components/reportes/KpiCards'
 import { FlujoProyectadoChart } from '@/components/reportes/FlujoProyectadoChart'
 import { CarteraVencidaTabla } from '@/components/reportes/CarteraVencidaTabla'
 import { EmbudoChart } from '@/components/reportes/EmbudoChart'
+import { Card, CardContent } from '@/components/ui/card'
 
 const ROLES_PANEL_EJECUTIVO = ['dueno', 'administrador', 'contador']
 
@@ -22,16 +26,20 @@ export default async function DashboardPage() {
   if (!usuario) return null // proxy.ts ya protege /dashboard, esto no debería pasar
 
   if (ROLES_PANEL_EJECUTIVO.includes(usuario.rol)) {
-    const [kpis, carteraVencida, flujo, prospectos] = await Promise.all([
+    const [kpis, carteraVencida, flujo, prospectos, proyectos] = await Promise.all([
       obtenerKpis(),
       obtenerCarteraVencida(),
       obtenerFlujoProyectado(),
       listarProspectos(),
+      listarProyectos(),
     ])
 
     return (
       <div className="space-y-8">
-        <h1 className="text-xl font-semibold">Panel ejecutivo</h1>
+        <div>
+          <h1 className="text-2xl font-semibold tracking-tight">Panel ejecutivo</h1>
+          <p className="text-sm text-muted-foreground">Vista general del negocio</p>
+        </div>
 
         <KpiCards kpis={kpis} />
 
@@ -51,10 +59,30 @@ export default async function DashboardPage() {
           <CarteraVencidaTabla filas={carteraVencida} />
         </section>
 
-        <p className="text-xs text-amber-600">
-          Proyección económica por proyecto con participación por socio: pendiente — no existe
-          todavía un endpoint de lectura para la tabla socios ni el cálculo de reparto.
-        </p>
+        <section>
+          <h2 className="mb-2 font-medium">Proyección económica por proyecto</h2>
+          {proyectos.length === 0 ? (
+            <p className="text-sm text-muted-foreground">Sin proyectos registrados.</p>
+          ) : (
+            <div className="space-y-2">
+              {proyectos.map((p) => (
+                <Link key={p.id} href={`/contabilidad/proyectos/${p.id}`}>
+                  <Card className="transition-shadow hover:shadow-md">
+                    <CardContent className="flex items-center justify-between">
+                      <div>
+                        <p className="text-sm font-medium">{p.nombre}</p>
+                        {p.descripcion && (
+                          <p className="text-xs text-muted-foreground">{p.descripcion}</p>
+                        )}
+                      </div>
+                      <ChevronRight className="size-4 text-muted-foreground" />
+                    </CardContent>
+                  </Card>
+                </Link>
+              ))}
+            </div>
+          )}
+        </section>
       </div>
     )
   }
@@ -63,7 +91,10 @@ export default async function DashboardPage() {
     const prospectos = await listarProspectos()
     return (
       <div className="space-y-6">
-        <h1 className="text-xl font-semibold">Mi panel</h1>
+        <div>
+          <h1 className="text-2xl font-semibold tracking-tight">Mi panel</h1>
+          <p className="text-sm text-muted-foreground">{usuario.nombre}</p>
+        </div>
         <section>
           <h2 className="mb-2 font-medium">Mi embudo</h2>
           <EmbudoChart conteoPorEtapa={contarPorEtapa(prospectos)} />
@@ -74,7 +105,7 @@ export default async function DashboardPage() {
 
   return (
     <div>
-      <h1 className="text-xl font-semibold">Panel</h1>
+      <h1 className="text-2xl font-semibold tracking-tight">Panel</h1>
     </div>
   )
 }

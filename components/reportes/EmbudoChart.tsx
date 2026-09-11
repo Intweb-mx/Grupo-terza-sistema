@@ -15,7 +15,7 @@ export function EmbudoChart({ conteoPorEtapa }: { conteoPorEtapa: Record<string,
   const total = ETAPAS_EMBUDO.reduce((s, e) => s + (conteoPorEtapa[e] ?? 0), 0) + perdidos
 
   if (total === 0) {
-    return <p className="text-sm text-gray-500">Sin prospectos todavía.</p>
+    return <p className="text-sm text-muted-foreground">Sin prospectos todavía.</p>
   }
 
   return (
@@ -24,25 +24,27 @@ export function EmbudoChart({ conteoPorEtapa }: { conteoPorEtapa: Record<string,
         const conteo = conteoPorEtapa[etapa] ?? 0
         return (
           <div key={etapa} className="flex items-center gap-3">
-            <span className="w-24 shrink-0 text-xs text-gray-500">{ETIQUETA_ETAPA[etapa]}</span>
+            <span className="w-24 shrink-0 text-xs text-muted-foreground">
+              {ETIQUETA_ETAPA[etapa]}
+            </span>
             <div
               title={`${ETIQUETA_ETAPA[etapa]}: ${conteo}`}
               className={`h-6 rounded-r ${COLOR_POR_ETAPA[etapa]}`}
               style={{ width: `${Math.max(4, (conteo / max) * 100)}%` }}
             />
-            <span className="text-xs text-gray-600">{conteo}</span>
+            <span className="text-xs text-muted-foreground">{conteo}</span>
           </div>
         )
       })}
 
       <div className="mt-3 flex items-center gap-3 border-t pt-2">
-        <span className="w-24 shrink-0 text-xs text-gray-500">Perdidos</span>
+        <span className="w-24 shrink-0 text-xs text-muted-foreground">Perdidos</span>
         <div
           title={`Perdidos: ${perdidos}`}
-          className="h-6 rounded-r bg-gray-300"
+          className="h-6 rounded-r bg-muted"
           style={{ width: `${Math.max(4, (perdidos / max) * 100)}%` }}
         />
-        <span className="text-xs text-gray-600">{perdidos}</span>
+        <span className="text-xs text-muted-foreground">{perdidos}</span>
       </div>
     </div>
   )

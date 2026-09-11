@@ -1,5 +1,14 @@
 import Link from 'next/link'
 import { formatearCentavos } from '@/lib/utils/moneda'
+import { Badge } from '@/components/ui/badge'
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table'
 
 type FilaCartera = {
   cliente_id: string
@@ -11,45 +20,46 @@ type FilaCartera = {
 
 export function CarteraVencidaTabla({ filas }: { filas: FilaCartera[] }) {
   if (filas.length === 0) {
-    return <p className="text-sm text-gray-500">Sin cartera vencida — todos al corriente.</p>
+    return <p className="text-sm text-muted-foreground">Sin cartera vencida — todos al corriente.</p>
   }
 
   return (
-    <div className="overflow-x-auto rounded border">
-      <table className="w-full min-w-[560px] text-sm">
-        <thead className="bg-gray-50 text-left text-xs text-gray-500">
-          <tr>
-            <th className="px-3 py-2">Cliente</th>
-            <th className="px-3 py-2">Días de atraso</th>
-            <th className="px-3 py-2">Monto vencido</th>
-            <th className="px-3 py-2">Penalización</th>
-          </tr>
-        </thead>
-        <tbody className="divide-y">
+    <div className="overflow-x-auto rounded-lg border bg-card">
+      <Table className="min-w-[560px]">
+        <TableHeader>
+          <TableRow>
+            <TableHead>Cliente</TableHead>
+            <TableHead>Días de atraso</TableHead>
+            <TableHead>Monto vencido</TableHead>
+            <TableHead>Penalización</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
           {filas.map((f) => (
-            <tr key={f.cliente_id}>
-              <td className="px-3 py-2">
-                <Link href={`/clientes/${f.cliente_id}`} className="text-blue-600 hover:underline">
+            <TableRow key={f.cliente_id}>
+              <TableCell>
+                <Link href={`/clientes/${f.cliente_id}`} className="text-primary hover:underline">
                   {f.nombre}
                 </Link>
-              </td>
-              <td className="px-3 py-2">
-                <span
-                  className={`rounded border px-2 py-0.5 text-xs ${
+              </TableCell>
+              <TableCell>
+                <Badge
+                  variant="outline"
+                  className={
                     f.dias_atraso > 3
                       ? 'border-red-300 bg-red-100 text-red-800'
                       : 'border-amber-300 bg-amber-100 text-amber-800'
-                  }`}
+                  }
                 >
                   {f.dias_atraso} días
-                </span>
-              </td>
-              <td className="px-3 py-2 font-medium">{formatearCentavos(f.monto_vencido)}</td>
-              <td className="px-3 py-2">{formatearCentavos(f.penalizacion_aplicada)}</td>
-            </tr>
+                </Badge>
+              </TableCell>
+              <TableCell className="font-medium">{formatearCentavos(f.monto_vencido)}</TableCell>
+              <TableCell>{formatearCentavos(f.penalizacion_aplicada)}</TableCell>
+            </TableRow>
           ))}
-        </tbody>
-      </table>
+        </TableBody>
+      </Table>
     </div>
   )
 }
