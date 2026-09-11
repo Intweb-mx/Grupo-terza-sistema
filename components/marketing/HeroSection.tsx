@@ -17,7 +17,6 @@ const config = {
   description:
     'propiedades, contratos y cobranza en un solo sistema, sin hojas de cálculo',
   // Cifras ilustrativas — reemplazar por métricas reales del negocio.
-  statTopRight: { value: '+120', label: 'propiedades activas', align: 'right' } as Stat,
   statBottomLeft: { value: '+98%', label: 'cobranza al día', align: 'left' } as Stat,
   statBottomRight: { value: '+40', label: 'asesores conectados', align: 'right' } as Stat,
 }
@@ -61,19 +60,6 @@ export const HeroSection: FC = () => {
         <p className="max-w-md text-[15px] leading-snug text-white/80">
           {config.description}
         </p>
-
-        {/* estadística: arriba a la derecha */}
-        <div className="absolute right-6 top-[14%] md:right-24">
-          <div className="flex items-center justify-end gap-3">
-            <DiagonalDivider rotate="20" />
-            <span className="text-4xl font-medium tracking-tight text-white md:text-5xl">
-              {config.statTopRight.value}
-            </span>
-          </div>
-          <p className="mt-1 text-right text-xs text-white/70 md:text-sm">
-            {config.statTopRight.label}
-          </p>
-        </div>
 
         {/* estadística: abajo a la izquierda */}
         <div className="absolute bottom-20 left-6 md:bottom-24 md:left-20">
