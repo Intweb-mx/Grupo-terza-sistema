@@ -1,14 +1,12 @@
-import { redirect } from 'next/navigation'
-import { getUsuarioActual } from '@/lib/server/auth'
 import { ProspectoForm } from '@/components/crm/ProspectoForm'
 
-export default async function NuevoProspectoPage() {
-  const usuario = await getUsuarioActual()
-  if (!usuario) redirect('/login')
-
+export default function NuevoProspectoPage() {
   return (
     <div className="space-y-6">
-      <h1 className="text-xl font-semibold">Nuevo prospecto</h1>
+      <div>
+        <h1 className="text-2xl font-semibold tracking-tight">Nuevo prospecto</h1>
+        <p className="text-sm text-muted-foreground">Captación de lead</p>
+      </div>
       <ProspectoForm />
     </div>
   )
