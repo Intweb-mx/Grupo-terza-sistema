@@ -2,6 +2,7 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
+import { useLayoutEffect, useRef, useState } from 'react'
 import { cn } from '@/lib/utils'
 import { Badge } from '@/components/ui/badge'
 import { SignOutButton } from './SignOutButton'
@@ -29,6 +30,21 @@ export function Sidebar({
 }) {
   const pathname = usePathname()
   const nav = NAV_POR_ROL[rol] ?? []
+  const navRef = useRef<HTMLElement>(null)
+  const [indicador, setIndicador] = useState<{ top: number; height: number } | null>(null)
+
+  // Pill que se desliza al cambiar de sección — medido vía DOM contra el
+  // link activo en vez de calcularlo por índice, para no depender del
+  // orden ni del alto exacto de cada item.
+  useLayoutEffect(() => {
+    const contenedor = navRef.current
+    const activo = contenedor?.querySelector<HTMLElement>('[data-active="true"]')
+    if (!contenedor || !activo) {
+      setIndicador(null)
+      return
+    }
+    setIndicador({ top: activo.offsetTop, height: activo.offsetHeight })
+  }, [pathname, nav.length])
 
   return (
     <aside className="hidden shrink-0 p-3 md:block">
@@ -40,7 +56,14 @@ export function Sidebar({
           <span className="text-sm font-semibold tracking-tight">Grupo Terza</span>
         </div>
 
-        <nav className="flex-1 space-y-0.5 p-3">
+        <nav ref={navRef} className="relative flex-1 space-y-0.5 p-3">
+          {indicador && (
+            <div
+              aria-hidden
+              className="absolute inset-x-3 rounded-xl bg-white/80 shadow-sm backdrop-blur-md transition-[top,height] duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] motion-reduce:transition-none"
+              style={{ top: indicador.top, height: indicador.height }}
+            />
+          )}
           {nav.map((item) => {
             const activo = esActivo(pathname, item.href)
             const Icon = item.icon
@@ -48,14 +71,15 @@ export function Sidebar({
               <Link
                 key={item.href}
                 href={item.href}
+                data-active={activo}
                 className={cn(
-                  'group flex items-center gap-2.5 rounded-xl px-3 py-2 text-sm font-medium transition-all',
+                  'group relative z-10 flex items-center gap-2.5 rounded-xl px-3 py-2 text-sm font-medium transition-colors duration-200',
                   activo
-                    ? 'bg-white/80 text-primary shadow-sm backdrop-blur-md'
+                    ? 'text-primary'
                     : 'text-muted-foreground hover:bg-white/50 hover:text-foreground hover:backdrop-blur-md'
                 )}
               >
-                <Icon className="size-4 transition-transform motion-safe:group-hover:scale-110" />
+                <Icon className="size-4 transition-transform duration-200 ease-[cubic-bezier(0.34,1.56,0.64,1)] motion-safe:group-hover:scale-110" />
                 {item.label}
               </Link>
             )

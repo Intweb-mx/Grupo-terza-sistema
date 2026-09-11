@@ -41,16 +41,57 @@ const tabsListVariants = cva(
 function TabsList({
   className,
   variant = "default",
+  children,
   ...props
 }: React.ComponentProps<typeof TabsPrimitive.List> &
   VariantProps<typeof tabsListVariants>) {
+  const listRef = React.useRef<HTMLDivElement>(null)
+  const [indicador, setIndicador] = React.useState<{ left: number; width: number } | null>(null)
+
+  // Pill que se desliza entre triggers (segmented control estilo
+  // Linear/Arc), medido vía DOM en vez de estado controlado porque
+  // Tabs puede usarse tanto controlado como no controlado.
+  React.useLayoutEffect(() => {
+    if (variant !== "default") return
+    const lista = listRef.current
+    if (!lista) return
+
+    function medir() {
+      const activo = lista?.querySelector<HTMLElement>(
+        '[data-slot="tabs-trigger"][data-state="active"]'
+      )
+      if (!lista || !activo) return
+      setIndicador({ left: activo.offsetLeft, width: activo.offsetWidth })
+    }
+
+    medir()
+    const mutObserver = new MutationObserver(medir)
+    mutObserver.observe(lista, { attributes: true, attributeFilter: ["data-state"], subtree: true })
+    const resizeObserver = new ResizeObserver(medir)
+    resizeObserver.observe(lista)
+    return () => {
+      mutObserver.disconnect()
+      resizeObserver.disconnect()
+    }
+  }, [variant])
+
   return (
     <TabsPrimitive.List
+      ref={listRef}
       data-slot="tabs-list"
       data-variant={variant}
-      className={cn(tabsListVariants({ variant }), className)}
+      className={cn(tabsListVariants({ variant }), "relative", className)}
       {...props}
-    />
+    >
+      {variant === "default" && indicador && (
+        <div
+          aria-hidden
+          className="absolute inset-y-[3px] rounded-md bg-background shadow-sm transition-[left,width] duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] motion-reduce:transition-none"
+          style={{ left: indicador.left, width: indicador.width }}
+        />
+      )}
+      {children}
+    </TabsPrimitive.List>
   )
 }
 
@@ -62,9 +103,9 @@ function TabsTrigger({
     <TabsPrimitive.Trigger
       data-slot="tabs-trigger"
       className={cn(
-        "relative inline-flex h-[calc(100%-1px)] flex-1 items-center justify-center gap-1.5 rounded-md border border-transparent px-1.5 py-0.5 text-sm font-medium whitespace-nowrap text-foreground/60 transition-all group-data-vertical/tabs:w-full group-data-vertical/tabs:justify-start hover:text-foreground focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-1 focus-visible:outline-ring disabled:pointer-events-none disabled:opacity-50 has-data-[icon=inline-end]:pr-1 has-data-[icon=inline-start]:pl-1 dark:text-muted-foreground dark:hover:text-foreground group-data-[variant=default]/tabs-list:data-active:shadow-sm group-data-[variant=line]/tabs-list:data-active:shadow-none [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
+        "relative z-10 inline-flex h-[calc(100%-1px)] flex-1 items-center justify-center gap-1.5 rounded-md border border-transparent px-1.5 py-0.5 text-sm font-medium whitespace-nowrap text-foreground/60 transition-colors duration-200 ease-[cubic-bezier(0.16,1,0.3,1)] group-data-vertical/tabs:w-full group-data-vertical/tabs:justify-start hover:text-foreground focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-1 focus-visible:outline-ring disabled:pointer-events-none disabled:opacity-50 has-data-[icon=inline-end]:pr-1 has-data-[icon=inline-start]:pl-1 dark:text-muted-foreground dark:hover:text-foreground [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
         "group-data-[variant=line]/tabs-list:bg-transparent group-data-[variant=line]/tabs-list:data-active:bg-transparent dark:group-data-[variant=line]/tabs-list:data-active:border-transparent dark:group-data-[variant=line]/tabs-list:data-active:bg-transparent",
-        "data-active:bg-background data-active:text-foreground dark:data-active:border-input dark:data-active:bg-input/30 dark:data-active:text-foreground",
+        "data-active:text-foreground dark:data-active:text-foreground",
         "after:absolute after:bg-foreground after:opacity-0 after:transition-opacity group-data-horizontal/tabs:after:inset-x-0 group-data-horizontal/tabs:after:bottom-[-5px] group-data-horizontal/tabs:after:h-0.5 group-data-vertical/tabs:after:inset-y-0 group-data-vertical/tabs:after:-right-1 group-data-vertical/tabs:after:w-0.5 group-data-[variant=line]/tabs-list:data-active:after:opacity-100",
         className
       )}

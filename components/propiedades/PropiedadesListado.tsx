@@ -139,18 +139,18 @@ export function PropiedadesListado({ propiedades }: { propiedades: Propiedad[] }
       {vista === 'lista' ? (
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {filtradas.map((p, i) => (
-            <Link key={p.id} href={`/propiedades/${p.id}`}>
+            <Link key={p.id} href={`/propiedades/${p.id}`} className="group">
               <Card
-                className="gap-3 overflow-hidden py-0 transition-shadow hover:shadow-md"
+                className="gap-3 overflow-hidden py-0 transition-[transform,box-shadow] duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] hover:-translate-y-1 hover:shadow-[0_20px_40px_-12px_rgba(15,23,42,0.25)] motion-reduce:hover:translate-y-0"
                 style={{ animationDelay: `${Math.min(i, 8) * 60}ms` }}
               >
-                <div className="aspect-video w-full bg-muted">
+                <div className="aspect-video w-full overflow-hidden bg-muted">
                   {p.imagen_url && (
                     // eslint-disable-next-line @next/next/no-img-element
                     <img
                       src={p.imagen_url}
                       alt={p.titulo}
-                      className="h-full w-full object-cover"
+                      className="h-full w-full object-cover transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-105"
                     />
                   )}
                 </div>
