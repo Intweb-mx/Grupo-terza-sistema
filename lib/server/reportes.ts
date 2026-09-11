@@ -20,32 +20,36 @@ export async function obtenerKpis() {
   await exigirRolEjecutivo()
   const supabase = await createServerSupabaseClient()
 
-  const { count: propiedadesDisponibles } = await supabase
-    .from('propiedades')
-    .select('*', { count: 'exact', head: true })
-    .eq('estado_disponibilidad', 'disponible')
-
-  const { count: propiedadesVendidas } = await supabase
-    .from('propiedades')
-    .select('*', { count: 'exact', head: true })
-    .eq('estado_disponibilidad', 'vendido')
-
   const inicioMes = new Date()
   inicioMes.setUTCDate(1)
   const inicioMesIso = inicioMes.toISOString().slice(0, 10)
+  const hoy = new Date().toISOString().slice(0, 10)
 
-  const { data: ingresosMes } = await supabase
-    .from('movimientos_contables')
-    .select('monto')
-    .eq('tipo', 'ingreso')
-    .gte('fecha', inicioMesIso)
+  // Cuatro queries independientes — antes corrían una tras otra (4
+  // round-trips), acá van en paralelo (1 round-trip de latencia).
+  const [
+    { count: propiedadesDisponibles },
+    { count: propiedadesVendidas },
+    { data: ingresosMes },
+    { data: vencidas },
+  ] = await Promise.all([
+    supabase
+      .from('propiedades')
+      .select('*', { count: 'exact', head: true })
+      .eq('estado_disponibilidad', 'disponible'),
+    supabase
+      .from('propiedades')
+      .select('*', { count: 'exact', head: true })
+      .eq('estado_disponibilidad', 'vendido'),
+    supabase.from('movimientos_contables').select('monto').eq('tipo', 'ingreso').gte('fecha', inicioMesIso),
+    supabase
+      .from('amortizaciones')
+      .select('total, contrato_id')
+      .in('estado', ['pendiente', 'vencido'])
+      .lt('fecha_corte', hoy),
+  ])
+
   const ingresosMesActual = (ingresosMes ?? []).reduce((suma, m) => suma + m.monto, 0)
-
-  const { data: vencidas } = await supabase
-    .from('amortizaciones')
-    .select('total, contrato_id')
-    .in('estado', ['pendiente', 'vencido'])
-    .lt('fecha_corte', new Date().toISOString().slice(0, 10))
   const montoCarteraVencida = (vencidas ?? []).reduce((suma, a) => suma + a.total, 0)
   const clientesEnMora = new Set((vencidas ?? []).map((a) => a.contrato_id)).size
 
