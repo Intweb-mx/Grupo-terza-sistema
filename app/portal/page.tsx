@@ -8,6 +8,7 @@ import {
 import { CalendarioAmortizacion } from '@/components/cartera/CalendarioAmortizacion'
 import { PagosHistorial } from '@/components/portal/PagosHistorial'
 import { SignOutButton } from '@/components/shell/SignOutButton'
+import { BackgroundMesh } from '@/components/shell/BackgroundMesh'
 
 export default async function PortalPage() {
   let saldo, cuotas, pagos
@@ -28,10 +29,12 @@ export default async function PortalPage() {
     .reduce((suma, c) => suma + c.penalizacion, 0)
 
   return (
-    <div className="min-h-screen bg-muted/40">
-      <header className="flex items-center justify-between border-b bg-card px-6 py-4">
+    <div className="relative min-h-screen bg-muted/40">
+      <BackgroundMesh />
+
+      <header className="m-3 flex items-center justify-between rounded-2xl border border-white/60 bg-white/65 px-6 py-4 shadow-[0_8px_30px_-12px_rgba(15,23,42,0.18)] backdrop-blur-xl backdrop-saturate-150">
         <div className="flex items-center gap-2">
-          <div className="flex size-8 items-center justify-center rounded-lg bg-primary text-sm font-semibold text-primary-foreground">
+          <div className="flex size-8 items-center justify-center rounded-lg bg-primary text-sm font-semibold text-primary-foreground shadow-sm shadow-primary/30">
             T
           </div>
           <span className="text-sm font-semibold tracking-tight">Grupo Terza · Portal</span>

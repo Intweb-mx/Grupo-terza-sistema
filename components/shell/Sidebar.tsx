@@ -31,44 +31,46 @@ export function Sidebar({
   const nav = NAV_POR_ROL[rol] ?? []
 
   return (
-    <aside className="hidden w-64 shrink-0 flex-col border-r bg-card md:flex">
-      <div className="flex items-center gap-2 border-b px-5 py-4">
-        <div className="flex size-8 items-center justify-center rounded-lg bg-primary text-sm font-semibold text-primary-foreground">
-          T
+    <aside className="hidden shrink-0 p-3 md:block">
+      <div className="flex h-[calc(100vh-1.5rem)] w-60 flex-col rounded-2xl border border-white/60 bg-white/65 shadow-[0_8px_30px_-12px_rgba(15,23,42,0.18)] backdrop-blur-xl backdrop-saturate-150">
+        <div className="flex items-center gap-2 border-b border-white/50 px-5 py-4">
+          <div className="flex size-8 items-center justify-center rounded-lg bg-primary text-sm font-semibold text-primary-foreground shadow-sm shadow-primary/30">
+            T
+          </div>
+          <span className="text-sm font-semibold tracking-tight">Grupo Terza</span>
         </div>
-        <span className="text-sm font-semibold tracking-tight">Grupo Terza</span>
-      </div>
 
-      <nav className="flex-1 space-y-0.5 p-3">
-        {nav.map((item) => {
-          const activo = esActivo(pathname, item.href)
-          const Icon = item.icon
-          return (
-            <Link
-              key={item.href}
-              href={item.href}
-              className={cn(
-                'flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm font-medium transition-colors',
-                activo
-                  ? 'bg-primary/10 text-primary'
-                  : 'text-muted-foreground hover:bg-muted hover:text-foreground'
-              )}
-            >
-              <Icon className="size-4" />
-              {item.label}
-            </Link>
-          )
-        })}
-      </nav>
+        <nav className="flex-1 space-y-0.5 p-3">
+          {nav.map((item) => {
+            const activo = esActivo(pathname, item.href)
+            const Icon = item.icon
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                className={cn(
+                  'flex items-center gap-2.5 rounded-xl px-3 py-2 text-sm font-medium transition-all',
+                  activo
+                    ? 'bg-white/80 text-primary shadow-sm backdrop-blur-md'
+                    : 'text-muted-foreground hover:bg-white/50 hover:text-foreground hover:backdrop-blur-md'
+                )}
+              >
+                <Icon className="size-4" />
+                {item.label}
+              </Link>
+            )
+          })}
+        </nav>
 
-      <div className="border-t p-3">
-        <div className="mb-2 px-2">
-          <p className="truncate text-sm font-medium">{nombre}</p>
-          <Badge variant="secondary" className="mt-1 font-normal">
-            {ETIQUETA_ROL[rol] ?? rol}
-          </Badge>
+        <div className="border-t border-white/50 p-3">
+          <div className="mb-2 px-2">
+            <p className="truncate text-sm font-medium">{nombre}</p>
+            <Badge variant="secondary" className="mt-1 font-normal">
+              {ETIQUETA_ROL[rol] ?? rol}
+            </Badge>
+          </div>
+          <SignOutButton />
         </div>
-        <SignOutButton />
       </div>
     </aside>
   )

@@ -47,28 +47,18 @@ const DiagonalDivider: FC<{ rotate: '20' | '-20' }> = ({ rotate }) => (
 )
 
 export const HeroSection: FC = () => {
-  const [word1, word2, word3] = config.headline
-
   return (
     <section className="hero-font relative h-screen w-full overflow-hidden bg-black">
-      <div className="absolute inset-0 flex items-center justify-center">
-        <LogoMark idPrefix="hero" animated className="h-[85vmin] w-[85vmin] opacity-90" />
-      </div>
-
       <Navbar />
 
-      <div className="relative h-full w-full">
-        <h1 className="hero-title absolute left-4 top-[18%] text-[14vw] font-medium text-white md:left-10 md:text-[13vw]">
-          {word1}
-        </h1>
-        <h1 className="hero-title absolute right-4 top-[38%] text-[14vw] font-medium text-white md:right-10 md:text-[13vw]">
-          {word2}
-        </h1>
-        <h1 className="hero-title absolute left-[18%] top-[58%] text-[14vw] font-medium text-white md:left-[28%] md:text-[13vw]">
-          {word3}
+      <div className="relative flex h-full w-full flex-col items-center justify-center gap-5 px-6 text-center">
+        <LogoMark idPrefix="hero" animated className="h-[34vmin] w-[34vmin]" />
+
+        <h1 className="hero-title text-[11vw] font-medium text-white md:text-[5.5vw]">
+          {config.headline.join(' ')}
         </h1>
 
-        <p className="absolute left-6 top-[46%] max-w-[240px] text-[15px] leading-snug text-white/90 md:left-10">
+        <p className="max-w-md text-[15px] leading-snug text-white/80">
           {config.description}
         </p>
 
