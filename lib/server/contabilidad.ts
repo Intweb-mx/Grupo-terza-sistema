@@ -18,11 +18,24 @@ export async function listarProyectos() {
 export async function obtenerEstadoProyecto(proyectoId: string) {
   const supabase = await createServerSupabaseClient()
 
-  const { data: movimientosProyecto, error } = await supabase
-    .from('movimientos_contables')
-    .select('tipo, monto')
-    .eq('proyecto_id', proyectoId)
+  // Las tres queries son independientes entre sí — corrían en secuencia
+  // (3 round-trips) sin necesidad; en paralelo es 1 round-trip de latencia.
+  const [
+    { data: movimientosProyecto, error },
+    { data: gastosFijosNegocio, error: errorFijos },
+    { data: ingresosNegocio, error: errorIngresos },
+  ] = await Promise.all([
+    supabase.from('movimientos_contables').select('tipo, monto').eq('proyecto_id', proyectoId),
+    supabase.from('movimientos_contables').select('monto').eq('tipo', 'egreso').is('proyecto_id', null),
+    supabase
+      .from('movimientos_contables')
+      .select('monto')
+      .eq('tipo', 'ingreso')
+      .not('proyecto_id', 'is', null),
+  ])
   if (error) throw error
+  if (errorFijos) throw errorFijos
+  if (errorIngresos) throw errorIngresos
 
   const ingresos = movimientosProyecto
     .filter((m) => m.tipo === 'ingreso')
@@ -30,21 +43,7 @@ export async function obtenerEstadoProyecto(proyectoId: string) {
   const gastosVariables = movimientosProyecto
     .filter((m) => m.tipo === 'egreso')
     .reduce((suma, m) => suma + m.monto, 0)
-
-  const { data: gastosFijosNegocio, error: errorFijos } = await supabase
-    .from('movimientos_contables')
-    .select('monto')
-    .eq('tipo', 'egreso')
-    .is('proyecto_id', null)
-  if (errorFijos) throw errorFijos
   const totalGastosFijos = gastosFijosNegocio.reduce((suma, m) => suma + m.monto, 0)
-
-  const { data: ingresosNegocio, error: errorIngresos } = await supabase
-    .from('movimientos_contables')
-    .select('monto')
-    .eq('tipo', 'ingreso')
-    .not('proyecto_id', 'is', null)
-  if (errorIngresos) throw errorIngresos
   const totalIngresosNegocio = ingresosNegocio.reduce((suma, m) => suma + m.monto, 0)
 
   const proporcion = totalIngresosNegocio > 0 ? ingresos / totalIngresosNegocio : 0
@@ -66,12 +65,13 @@ export async function obtenerEstadoProyecto(proyectoId: string) {
 // (regla de negocio #4 — no sobre ingresos totales del negocio). Cada socio
 // recibe su porcentaje_participacion de esa utilidad.
 export async function obtenerRepartoUtilidades(proyectoId: string) {
-  const estado = await obtenerEstadoProyecto(proyectoId)
   const supabase = await createServerSupabaseClient()
 
-  const { data: socios, error } = await supabase
-    .from('socios')
-    .select('id, nombre, porcentaje_participacion')
+  // obtenerEstadoProyecto no depende de socios ni viceversa.
+  const [estado, { data: socios, error }] = await Promise.all([
+    obtenerEstadoProyecto(proyectoId),
+    supabase.from('socios').select('id, nombre, porcentaje_participacion'),
+  ])
   if (error) throw error
 
   const reparto = socios.map((socio) => ({

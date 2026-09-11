@@ -56,18 +56,22 @@ export async function listarClientes() {
 
 export async function obtenerCliente(id: string) {
   const supabase = await createServerSupabaseClient()
-  const { data: cliente, error } = await supabase
-    .from('clientes')
-    .select('*')
-    .eq('id', id)
-    .single()
-  if (error) throw error
 
-  const { data: contratos, error: errorContratos } = await supabase
-    .from('contratos')
-    .select('id, tipo, propiedad_id, fecha_inicio, fecha_fin, monto_total, estado')
-    .eq('cliente_id', id)
-    .order('created_at', { ascending: false })
+  // Ambas queries filtran por el mismo id recibido, ninguna depende del
+  // resultado de la otra — no había razón para esperar una antes de pedir
+  // la otra.
+  const [
+    { data: cliente, error },
+    { data: contratos, error: errorContratos },
+  ] = await Promise.all([
+    supabase.from('clientes').select('*').eq('id', id).single(),
+    supabase
+      .from('contratos')
+      .select('id, tipo, propiedad_id, fecha_inicio, fecha_fin, monto_total, estado')
+      .eq('cliente_id', id)
+      .order('created_at', { ascending: false }),
+  ])
+  if (error) throw error
   if (errorContratos) throw errorContratos
 
   return { ...cliente, contratos }
