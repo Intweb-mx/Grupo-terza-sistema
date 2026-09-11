@@ -32,6 +32,7 @@ export default async function EditarPropiedadPage({
           superficie_m2: propiedad.superficie_m2?.toString() ?? '',
           ciudad: propiedad.ciudad,
           descripcion: propiedad.descripcion ?? '',
+          imagen_url: propiedad.imagen_url ?? '',
         }}
       />
     </div>

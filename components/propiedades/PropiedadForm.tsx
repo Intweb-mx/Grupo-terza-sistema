@@ -20,6 +20,7 @@ type PropiedadFormValues = {
   direccion: string
   ciudad: string
   descripcion: string
+  imagen_url: string
 }
 
 const VALORES_VACIOS: PropiedadFormValues = {
@@ -30,6 +31,7 @@ const VALORES_VACIOS: PropiedadFormValues = {
   direccion: '',
   ciudad: '',
   descripcion: '',
+  imagen_url: '',
 }
 
 export function PropiedadForm({
@@ -58,7 +60,11 @@ export function PropiedadForm({
     setError(null)
     setGuardando(true)
 
-    const payload = {
+    // imagen_url no es parte del contrato de creación (POST /api/propiedades)
+    // — se manda solo en el PUT, que ya acepta cualquier campo por diseño.
+    // Al crear, primero se da de alta y después se setea la imagen en un
+    // segundo PUT, en vez de tocar el contrato de creación.
+    const payloadBase = {
       titulo: valores.titulo,
       tipo: valores.tipo,
       precio: Math.round(Number(valores.precio) * 100),
@@ -69,27 +75,43 @@ export function PropiedadForm({
     }
 
     try {
-      const res = await fetch(
-        esEdicion ? `/api/propiedades/${propiedadId}` : '/api/propiedades',
-        {
-          method: esEdicion ? 'PUT' : 'POST',
+      if (esEdicion) {
+        const res = await fetch(`/api/propiedades/${propiedadId}`, {
+          method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload),
+          body: JSON.stringify({ ...payloadBase, imagen_url: valores.imagen_url || undefined }),
+        })
+        if (!res.ok) {
+          setError('No se pudo guardar la propiedad')
+          setGuardando(false)
+          return
         }
-      )
+        router.push(`/propiedades/${propiedadId}`)
+        router.refresh()
+        return
+      }
 
+      const res = await fetch('/api/propiedades', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payloadBase),
+      })
       if (!res.ok) {
         setError('No se pudo guardar la propiedad')
         setGuardando(false)
         return
       }
+      const { id } = await res.json()
 
-      if (esEdicion) {
-        router.push(`/propiedades/${propiedadId}`)
-      } else {
-        const { id } = await res.json()
-        router.push(`/propiedades/${id}`)
+      if (valores.imagen_url) {
+        await fetch(`/api/propiedades/${id}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ imagen_url: valores.imagen_url }),
+        })
       }
+
+      router.push(`/propiedades/${id}`)
       router.refresh()
     } catch {
       setError('No se pudo guardar la propiedad')
@@ -172,6 +194,20 @@ export function PropiedadForm({
               id="direccion"
               value={valores.direccion}
               onChange={(e) => actualizar('direccion', e.target.value)}
+            />
+          </div>
+
+          <div className="space-y-1.5">
+            <Label htmlFor="imagen_url">
+              URL de imagen
+              <span className="font-normal text-muted-foreground"> · opcional</span>
+            </Label>
+            <Input
+              id="imagen_url"
+              type="url"
+              placeholder="https://…"
+              value={valores.imagen_url}
+              onChange={(e) => actualizar('imagen_url', e.target.value)}
             />
           </div>
 
