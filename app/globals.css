@@ -60,6 +60,33 @@
   line-height: 0.95;
 }
 
+/* Animación de "construcción" del logo (components/marketing/LogoMark.tsx).
+   Estado final por defecto (sin animar) para que quien pida menos
+   movimiento vea el emblema completo de una — la animación solo se activa
+   si el sistema no pidió prefers-reduced-motion. */
+.logo-piece {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .logo-piece {
+    opacity: 0;
+    animation: logo-piece-in 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+}
+
+@keyframes logo-piece-in {
+  from {
+    opacity: 0;
+    transform: scale(0.82);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
 :root {
   /* Paleta "CRM claro y profesional" — azul de confianza + verde de éxito,
      elegida vía ui-ux-pro-max (perfil "CRM & Client Management"). */
