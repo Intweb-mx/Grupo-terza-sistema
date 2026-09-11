@@ -6,7 +6,6 @@
 import type { FC } from 'react'
 import Link from 'next/link'
 
-type NavLink = { label: string; href: string }
 type Stat = { value: string; label: string; align: 'left' | 'right' }
 
 const config = {
@@ -15,12 +14,6 @@ const config = {
   // de propiedades/desarrollos cuando haya uno disponible.
   videoSrc:
     'https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260418_063509_7d167302-4fd4-480b-8260-18ab572333d4.mp4',
-  navLinks: [
-    { label: 'propiedades', href: '#propiedades' },
-    { label: 'cartera', href: '#cartera' },
-    { label: 'contratos', href: '#contratos' },
-    { label: 'contacto', href: '#contacto' },
-  ] satisfies NavLink[],
   ctaLabel: 'iniciar sesión',
   ctaHref: '/login',
   headline: ['controla', 'tu', 'cartera'] as [string, string, string],
@@ -51,21 +44,9 @@ const Navbar: FC = () => (
       <span className="text-sm font-normal tracking-tight text-white">{config.brand}</span>
     </div>
 
-    <div className="hidden items-center gap-1 rounded-full bg-neutral-900/90 px-3 py-2 backdrop-blur md:flex">
-      {config.navLinks.map((link) => (
-        <a
-          key={link.label}
-          href={link.href}
-          className="rounded-full px-5 py-2 text-sm text-neutral-300 transition-colors hover:text-white"
-        >
-          {link.label}
-        </a>
-      ))}
-    </div>
-
     <Link
       href={config.ctaHref}
-      className="rounded-full bg-white px-6 py-3 text-sm font-normal text-black transition-colors hover:bg-neutral-200"
+      className="rounded-full bg-white px-8 py-4 text-base font-medium text-black transition-colors hover:bg-neutral-200"
     >
       {config.ctaLabel}
     </Link>
