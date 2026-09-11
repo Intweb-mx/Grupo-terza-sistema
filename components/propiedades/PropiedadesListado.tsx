@@ -51,78 +51,85 @@ export function PropiedadesListado({ propiedades }: { propiedades: Propiedad[] }
 
   return (
     <div className="space-y-6">
-      <Card className="flex flex-wrap items-end gap-4 p-4">
-        <div className="space-y-1.5">
-          <Label className="text-xs text-muted-foreground">Tipo</Label>
-          <Select value={tipo} onValueChange={setTipo}>
-            <SelectTrigger size="sm" className="w-36">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value={TODOS}>Todos</SelectItem>
-              {TIPOS_PROPIEDAD.map((t) => (
-                <SelectItem key={t} value={t}>
-                  {t}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
+      <Card className="p-4">
+        {/* Fila de filtros en un div interno: Card ya trae "flex flex-col"
+            en su propia clase base, y cn() acá no hace merge de clases
+            conflictivas (no es tailwind-merge) — pasarle "flex flex-wrap"
+            directo al Card no pisa el flex-col, solo se suma y queda en
+            columna. */}
+        <div className="flex flex-wrap items-end gap-4">
+          <div className="space-y-1.5">
+            <Label className="text-xs text-muted-foreground">Tipo</Label>
+            <Select value={tipo} onValueChange={setTipo}>
+              <SelectTrigger size="sm" className="w-36">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value={TODOS}>Todos</SelectItem>
+                {TIPOS_PROPIEDAD.map((t) => (
+                  <SelectItem key={t} value={t}>
+                    {t}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
 
-        <div className="space-y-1.5">
-          <Label className="text-xs text-muted-foreground">Ciudad</Label>
-          <Input
-            value={ciudad}
-            onChange={(e) => setCiudad(e.target.value)}
-            placeholder="Ciudad"
-            className="h-8 w-40"
-          />
-        </div>
+          <div className="space-y-1.5">
+            <Label className="text-xs text-muted-foreground">Ciudad</Label>
+            <Input
+              value={ciudad}
+              onChange={(e) => setCiudad(e.target.value)}
+              placeholder="Ciudad"
+              className="h-8 w-40"
+            />
+          </div>
 
-        <div className="space-y-1.5">
-          <Label className="text-xs text-muted-foreground">Disponibilidad</Label>
-          <Select value={estado} onValueChange={setEstado}>
-            <SelectTrigger size="sm" className="w-40">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value={TODOS}>Todas</SelectItem>
-              {ESTADOS_DISPONIBILIDAD.map((e) => (
-                <SelectItem key={e} value={e}>
-                  {e}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
+          <div className="space-y-1.5">
+            <Label className="text-xs text-muted-foreground">Disponibilidad</Label>
+            <Select value={estado} onValueChange={setEstado}>
+              <SelectTrigger size="sm" className="w-40">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value={TODOS}>Todas</SelectItem>
+                {ESTADOS_DISPONIBILIDAD.map((e) => (
+                  <SelectItem key={e} value={e}>
+                    {e}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
 
-        <div className="space-y-1.5">
-          <Label className="text-xs text-muted-foreground">Precio máximo (MXN)</Label>
-          <Input
-            type="number"
-            value={precioMax}
-            onChange={(e) => setPrecioMax(e.target.value)}
-            placeholder="Sin límite"
-            className="h-8 w-36"
-          />
-        </div>
+          <div className="space-y-1.5">
+            <Label className="text-xs text-muted-foreground">Precio máximo (MXN)</Label>
+            <Input
+              type="number"
+              value={precioMax}
+              onChange={(e) => setPrecioMax(e.target.value)}
+              placeholder="Sin límite"
+              className="h-8 w-36"
+            />
+          </div>
 
-        <Tabs
-          value={vista}
-          onValueChange={(v) => setVista(v as 'lista' | 'mapa')}
-          className="ml-auto"
-        >
-          <TabsList>
-            <TabsTrigger value="lista" className="gap-1.5">
-              <LayoutGrid className="size-3.5" />
-              Lista
-            </TabsTrigger>
-            <TabsTrigger value="mapa" className="gap-1.5">
-              <MapPin className="size-3.5" />
-              Mapa
-            </TabsTrigger>
-          </TabsList>
-        </Tabs>
+          <Tabs
+            value={vista}
+            onValueChange={(v) => setVista(v as 'lista' | 'mapa')}
+            className="ml-auto"
+          >
+            <TabsList>
+              <TabsTrigger value="lista" className="gap-1.5">
+                <LayoutGrid className="size-3.5" />
+                Lista
+              </TabsTrigger>
+              <TabsTrigger value="mapa" className="gap-1.5">
+                <MapPin className="size-3.5" />
+                Mapa
+              </TabsTrigger>
+            </TabsList>
+          </Tabs>
+        </div>
       </Card>
 
       {filtradas.length === 0 && (
