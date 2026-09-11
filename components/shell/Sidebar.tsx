@@ -49,13 +49,13 @@ export function Sidebar({
                 key={item.href}
                 href={item.href}
                 className={cn(
-                  'flex items-center gap-2.5 rounded-xl px-3 py-2 text-sm font-medium transition-all',
+                  'group flex items-center gap-2.5 rounded-xl px-3 py-2 text-sm font-medium transition-all',
                   activo
                     ? 'bg-white/80 text-primary shadow-sm backdrop-blur-md'
                     : 'text-muted-foreground hover:bg-white/50 hover:text-foreground hover:backdrop-blur-md'
                 )}
               >
-                <Icon className="size-4" />
+                <Icon className="size-4 transition-transform motion-safe:group-hover:scale-110" />
                 {item.label}
               </Link>
             )

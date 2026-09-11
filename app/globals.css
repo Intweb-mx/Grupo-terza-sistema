@@ -87,6 +87,26 @@
   }
 }
 
+/* Transición al cambiar de ruta (components/shell/PageTransition.tsx) —
+   sin librería, un fade + leve subida que se repite en cada navegación
+   porque el wrapper se remonta (key={pathname}). */
+@media (prefers-reduced-motion: no-preference) {
+  .page-enter {
+    animation: page-enter-in 0.35s ease-out;
+  }
+}
+
+@keyframes page-enter-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 :root {
   /* Paleta "CRM claro y profesional" — azul de confianza + verde de éxito,
      elegida vía ui-ux-pro-max (perfil "CRM & Client Management"). */
