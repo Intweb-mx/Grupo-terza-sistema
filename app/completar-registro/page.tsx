@@ -2,7 +2,13 @@
 
 import { useEffect, useState, type FormEvent } from 'react'
 import { useRouter } from 'next/navigation'
+import { AlertCircle } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Alert, AlertDescription } from '@/components/ui/alert'
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 
 export default function CompletarRegistroPage() {
   const router = useRouter()
@@ -52,55 +58,59 @@ export default function CompletarRegistroPage() {
   }
 
   if (!listo) {
-    return <main className="flex flex-1 items-center justify-center p-6">Cargando…</main>
+    return (
+      <main className="flex flex-1 items-center justify-center bg-muted/40 p-6 text-sm text-muted-foreground">
+        Cargando…
+      </main>
+    )
   }
 
   return (
-    <main className="flex flex-1 items-center justify-center p-6">
-      <form onSubmit={handleSubmit} className="w-full max-w-sm space-y-4">
-        <h1 className="text-xl font-semibold">Completar registro</h1>
-        <p className="text-sm text-gray-500">Elegí una contraseña para tu cuenta.</p>
+    <main className="flex flex-1 items-center justify-center bg-muted/40 p-6">
+      <Card className="w-full max-w-sm">
+        <CardHeader>
+          <CardTitle className="text-xl">Completar registro</CardTitle>
+          <CardDescription>Elegí una contraseña para tu cuenta</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="space-y-1.5">
+              <Label htmlFor="password">Nueva contraseña</Label>
+              <Input
+                id="password"
+                type="password"
+                required
+                minLength={8}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+              />
+            </div>
 
-        <div className="space-y-1">
-          <label htmlFor="password" className="text-sm font-medium">
-            Nueva contraseña
-          </label>
-          <input
-            id="password"
-            type="password"
-            required
-            minLength={8}
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            className="w-full rounded border px-3 py-2"
-          />
-        </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="confirmar">Confirmar contraseña</Label>
+              <Input
+                id="confirmar"
+                type="password"
+                required
+                minLength={8}
+                value={confirmar}
+                onChange={(e) => setConfirmar(e.target.value)}
+              />
+            </div>
 
-        <div className="space-y-1">
-          <label htmlFor="confirmar" className="text-sm font-medium">
-            Confirmar contraseña
-          </label>
-          <input
-            id="confirmar"
-            type="password"
-            required
-            minLength={8}
-            value={confirmar}
-            onChange={(e) => setConfirmar(e.target.value)}
-            className="w-full rounded border px-3 py-2"
-          />
-        </div>
+            {error && (
+              <Alert variant="destructive">
+                <AlertCircle className="size-4" />
+                <AlertDescription>{error}</AlertDescription>
+              </Alert>
+            )}
 
-        {error && <p className="text-sm text-red-600">{error}</p>}
-
-        <button
-          type="submit"
-          disabled={guardando}
-          className="w-full rounded bg-black py-2 text-white disabled:opacity-50"
-        >
-          {guardando ? 'Guardando…' : 'Guardar y entrar'}
-        </button>
-      </form>
+            <Button type="submit" disabled={guardando} className="w-full">
+              {guardando ? 'Guardando…' : 'Guardar y entrar'}
+            </Button>
+          </form>
+        </CardContent>
+      </Card>
     </main>
   )
 }
