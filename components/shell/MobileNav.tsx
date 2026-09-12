@@ -22,7 +22,7 @@ export function MobileNav({ rol, nombre }: { rol: string; nombre: string }) {
   )
 
   return (
-    <div className="m-3 flex items-center justify-between rounded-2xl border border-white/60 bg-white/65 px-4 py-3 shadow-[0_8px_30px_-12px_rgba(15,23,42,0.18)] backdrop-blur-xl backdrop-saturate-150 md:hidden">
+    <div className="m-3 flex items-center justify-between rounded-[20px] border border-white/60 bg-white/65 px-4 py-3 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.7),0_8px_30px_-12px_rgba(15,23,42,0.18)] backdrop-blur-xl backdrop-saturate-150 md:hidden">
       <div>
         <p className="text-sm font-semibold">{actual?.label ?? 'Grupo Terza'}</p>
         <p className="text-xs text-muted-foreground">{nombre}</p>

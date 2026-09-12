@@ -42,7 +42,7 @@ export function KpiCards({ kpis }: { kpis: Kpis }) {
       valor: kpis.ingresos_mes_actual,
       format: formatearCentavos,
       icono: TrendingUp,
-      chip: 'bg-violet-500/10 text-violet-600',
+      chip: 'bg-sky-500/10 text-sky-600',
     },
     {
       etiqueta: 'Cartera vencida',
@@ -51,7 +51,7 @@ export function KpiCards({ kpis }: { kpis: Kpis }) {
       icono: AlertTriangle,
       nota: `${kpis.clientes_en_mora} cliente${kpis.clientes_en_mora === 1 ? '' : 's'} en mora`,
       alerta: kpis.clientes_en_mora > 0,
-      chip: 'bg-destructive/10 text-destructive',
+      chip: 'bg-orange-500/10 text-orange-600',
     },
   ]
 
@@ -62,17 +62,22 @@ export function KpiCards({ kpis }: { kpis: Kpis }) {
           <CardContent className="space-y-3">
             <div
               className={`flex size-9 items-center justify-center rounded-lg ${
-                t.alerta ? 'bg-destructive/10 text-destructive' : t.chip
+                t.alerta ? 'bg-orange-500/10 text-orange-600' : t.chip
               }`}
             >
               <t.icono className="size-4" />
             </div>
             <div>
-              <p className={`text-2xl font-semibold ${t.alerta ? 'text-destructive' : ''}`}>
+              <p className={`text-3xl font-bold tracking-tight ${t.alerta ? 'text-orange-600' : ''}`}>
                 <CountUp value={t.valor} format={t.format} />
               </p>
               <p className="text-xs text-muted-foreground">{t.etiqueta}</p>
-              {t.nota && <p className="mt-0.5 text-xs text-muted-foreground">{t.nota}</p>}
+              {t.nota && (
+                <p className="mt-0.5 flex items-center gap-1.5 text-xs text-muted-foreground">
+                  <span className="size-1.5 rounded-full bg-orange-500" />
+                  {t.nota}
+                </p>
+              )}
             </div>
           </CardContent>
         </Card>

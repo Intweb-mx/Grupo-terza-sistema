@@ -13,6 +13,7 @@ import { CalendarioAmortizacion } from '@/components/cartera/CalendarioAmortizac
 import { RegistrarPagoModal } from '@/components/cartera/RegistrarPagoModal'
 import { ReestructurarBoton } from '@/components/cartera/ReestructurarBoton'
 import { InvitarPortalBoton } from '@/components/cartera/InvitarPortalBoton'
+import { VolverLink } from '@/components/shell/VolverLink'
 
 const COLOR_POR_ESTADO_CONTRATO: Record<string, string> = {
   borrador: 'bg-muted text-muted-foreground border-border',
@@ -47,6 +48,7 @@ export default async function ClienteDetallePage({
 
   return (
     <div className="max-w-3xl space-y-8">
+      <VolverLink href="/clientes" label="Volver a clientes" />
       <div className="flex items-start justify-between">
         <div>
           <h1 className="text-2xl font-semibold tracking-tight">

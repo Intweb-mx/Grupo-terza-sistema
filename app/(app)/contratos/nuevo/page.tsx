@@ -4,6 +4,7 @@ import { listarClientes } from '@/lib/server/clientes'
 import { listarPropiedades } from '@/lib/server/propiedades'
 import { ContratoWizard } from '@/components/contratos/ContratoWizard'
 import { ROLES_GESTION_COMERCIAL } from '@/lib/utils/roles'
+import { VolverLink } from '@/components/shell/VolverLink'
 
 export default async function NuevoContratoPage({
   searchParams,
@@ -19,6 +20,10 @@ export default async function NuevoContratoPage({
 
   return (
     <div className="space-y-6">
+      <VolverLink
+        href={cliente_id ? `/clientes/${cliente_id}` : '/dashboard'}
+        label={cliente_id ? 'Volver al cliente' : 'Volver al panel'}
+      />
       <div>
         <h1 className="text-2xl font-semibold tracking-tight">Nuevo contrato</h1>
         <p className="text-sm text-muted-foreground">Compraventa, arrendamiento o renta temporal</p>

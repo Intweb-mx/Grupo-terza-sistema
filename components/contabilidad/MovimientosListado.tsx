@@ -1,7 +1,8 @@
 'use client'
 
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import Link from 'next/link'
+import { ArrowDownRight, ArrowUpRight, Scale } from 'lucide-react'
 import { formatearCentavos } from '@/lib/utils/moneda'
 import {
   Table,
@@ -71,8 +72,57 @@ export function MovimientosListado({
     cargar()
   }, [cargar, recargar])
 
+  const resumen = useMemo(() => {
+    if (!movimientos) return null
+    const ingresos = movimientos
+      .filter((m) => m.tipo === 'ingreso')
+      .reduce((s, m) => s + m.monto, 0)
+    const egresos = movimientos
+      .filter((m) => m.tipo === 'egreso')
+      .reduce((s, m) => s + m.monto, 0)
+    return { ingresos, egresos, balance: ingresos - egresos }
+  }, [movimientos])
+
   return (
     <div className="space-y-4">
+      {resumen && (
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+          <div className="flex items-center gap-3 rounded-[20px] border border-gray-200/70 bg-white p-4">
+            <span className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-emerald-500/10 text-emerald-600">
+              <ArrowUpRight className="size-4" />
+            </span>
+            <div>
+              <p className="text-xs text-muted-foreground">Ingresos {proyectoId === TODOS ? '' : 'del proyecto'}</p>
+              <p className="text-lg font-bold tracking-tight text-emerald-700">
+                {formatearCentavos(resumen.ingresos)}
+              </p>
+            </div>
+          </div>
+          <div className="flex items-center gap-3 rounded-[20px] border border-gray-200/70 bg-white p-4">
+            <span className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-orange-500/10 text-orange-600">
+              <ArrowDownRight className="size-4" />
+            </span>
+            <div>
+              <p className="text-xs text-muted-foreground">Egresos</p>
+              <p className="text-lg font-bold tracking-tight text-orange-700">
+                {formatearCentavos(resumen.egresos)}
+              </p>
+            </div>
+          </div>
+          <div className="flex items-center gap-3 rounded-[20px] border border-gray-200/70 bg-white p-4">
+            <span className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
+              <Scale className="size-4" />
+            </span>
+            <div>
+              <p className="text-xs text-muted-foreground">Balance</p>
+              <p className="text-lg font-bold tracking-tight text-primary">
+                {formatearCentavos(resumen.balance)}
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
       <div className="space-y-1.5">
         <label className="text-xs font-medium text-muted-foreground">Proyecto</label>
         <Select value={proyectoId} onValueChange={setProyectoId}>
@@ -97,7 +147,7 @@ export function MovimientosListado({
       ) : movimientos.length === 0 ? (
         <p className="text-sm text-muted-foreground">Sin movimientos todavía.</p>
       ) : (
-        <div className="overflow-x-auto rounded-lg border bg-card">
+        <div className="overflow-x-auto rounded-[20px] border border-gray-200/70 bg-card">
           <Table className="min-w-[720px]">
             <TableHeader>
               <TableRow>
@@ -119,8 +169,8 @@ export function MovimientosListado({
                       variant="outline"
                       className={
                         m.tipo === 'ingreso'
-                          ? 'border-green-300 bg-green-100 text-green-800'
-                          : 'border-red-300 bg-red-100 text-red-800'
+                          ? 'border-emerald-300 bg-emerald-100 text-emerald-800'
+                          : 'border-orange-300 bg-orange-100 text-orange-800'
                       }
                     >
                       {m.tipo}

@@ -2,7 +2,7 @@
 
 import { useMemo, useState, type FormEvent } from 'react'
 import { useRouter } from 'next/navigation'
-import { AlertCircle, Check } from 'lucide-react'
+import { AlertCircle, Check, FileText, Home, Tag, Users, Wallet } from 'lucide-react'
 import { formatearCentavos } from '@/lib/utils/moneda'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -110,27 +110,47 @@ export function ContratoWizard({
   }
 
   return (
-    <Card className="max-w-lg">
-      <CardContent className="space-y-6">
-        <ol className="flex gap-2">
-          {PASOS.map((label, i) => (
-            <li
-              key={label}
-              className={cn(
-                'flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-medium',
-                i === paso
-                  ? 'bg-primary text-primary-foreground'
-                  : i < paso
-                    ? 'bg-primary/10 text-primary'
-                    : 'bg-muted text-muted-foreground'
-              )}
-            >
-              {i < paso ? <Check className="size-3" /> : `${i + 1}.`} {label}
-            </li>
-          ))}
-        </ol>
+    <div className="grid grid-cols-1 items-start gap-6 lg:grid-cols-[1fr_18rem]">
+      <Card>
+        <CardContent className="space-y-6">
+          <ol className="flex items-center">
+            {PASOS.map((label, i) => (
+              <li key={label} className="flex flex-1 items-center last:flex-none">
+                <div className="flex flex-col items-center gap-1.5">
+                  <span
+                    className={cn(
+                      'flex size-8 shrink-0 items-center justify-center rounded-full text-xs font-semibold transition-colors duration-200',
+                      i === paso
+                        ? 'bg-primary text-primary-foreground shadow-[0_0_0_4px_rgba(37,99,235,0.15)]'
+                        : i < paso
+                          ? 'bg-primary/10 text-primary'
+                          : 'bg-muted text-muted-foreground'
+                    )}
+                  >
+                    {i < paso ? <Check className="size-3.5" /> : i + 1}
+                  </span>
+                  <span
+                    className={cn(
+                      'text-xs font-medium',
+                      i === paso ? 'text-primary' : 'text-muted-foreground'
+                    )}
+                  >
+                    {label}
+                  </span>
+                </div>
+                {i < PASOS.length - 1 && (
+                  <div
+                    className={cn(
+                      'mx-2 h-px flex-1 transition-colors duration-200',
+                      i < paso ? 'bg-primary/40' : 'bg-border'
+                    )}
+                  />
+                )}
+              </li>
+            ))}
+          </ol>
 
-        <form onSubmit={handleSubmitPaso} className="space-y-4">
+          <form onSubmit={handleSubmitPaso} className="space-y-4">
           {paso === 0 && (
             <div className="space-y-1.5">
               <Label htmlFor="cliente">Cliente</Label>
@@ -301,8 +321,56 @@ export function ContratoWizard({
               {paso < PASOS.length - 1 ? 'Siguiente' : guardando ? 'Creando…' : 'Crear contrato'}
             </Button>
           </div>
-        </form>
-      </CardContent>
-    </Card>
+          </form>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardContent className="space-y-4">
+          <div className="flex items-center gap-2.5">
+            <span className="flex size-9 items-center justify-center rounded-lg bg-primary/10 text-primary">
+              <FileText className="size-4" />
+            </span>
+            <div>
+              <p className="text-sm font-semibold">Resumen del contrato</p>
+              <p className="text-xs text-muted-foreground">Se completará conforme avances.</p>
+            </div>
+          </div>
+
+          <ul className="divide-y divide-border text-sm">
+            <li className="flex items-center justify-between py-2.5">
+              <span className="flex items-center gap-2 text-muted-foreground">
+                <Users className="size-3.5" /> Cliente
+              </span>
+              <span className="font-medium">
+                {cliente ? `${cliente.nombre} ${cliente.apellidos}` : '—'}
+              </span>
+            </li>
+            <li className="flex items-center justify-between py-2.5">
+              <span className="flex items-center gap-2 text-muted-foreground">
+                <Home className="size-3.5" /> Propiedad
+              </span>
+              <span className="max-w-[9rem] truncate text-right font-medium">
+                {propiedad?.titulo ?? '—'}
+              </span>
+            </li>
+            <li className="flex items-center justify-between py-2.5">
+              <span className="flex items-center gap-2 text-muted-foreground">
+                <Tag className="size-3.5" /> Tipo
+              </span>
+              <span className="font-medium capitalize">{tipo.replace('_', ' ')}</span>
+            </li>
+            <li className="flex items-center justify-between py-2.5">
+              <span className="flex items-center gap-2 text-muted-foreground">
+                <Wallet className="size-3.5" /> Total
+              </span>
+              <span className="font-medium">
+                {montoTotal ? formatearCentavos(Math.round(Number(montoTotal) * 100)) : '—'}
+              </span>
+            </li>
+          </ul>
+        </CardContent>
+      </Card>
+    </div>
   )
 }

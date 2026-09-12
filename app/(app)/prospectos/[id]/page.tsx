@@ -4,6 +4,7 @@ import { ETIQUETA_ETAPA } from '@/components/crm/constantes'
 import { Badge } from '@/components/ui/badge'
 import { InteraccionForm } from '@/components/crm/InteraccionForm'
 import { InteraccionesTimeline } from '@/components/crm/InteraccionesTimeline'
+import { VolverLink } from '@/components/shell/VolverLink'
 
 export default async function ProspectoDetallePage({
   params,
@@ -23,6 +24,7 @@ export default async function ProspectoDetallePage({
 
   return (
     <div className="max-w-2xl space-y-8">
+      <VolverLink href="/prospectos" label="Volver a prospectos" />
       <div>
         <h1 className="text-2xl font-semibold tracking-tight">{prospecto.nombre}</h1>
         <p className="text-sm text-muted-foreground">
