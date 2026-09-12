@@ -53,7 +53,10 @@ export function Sidebar({
           <div className="flex size-8 items-center justify-center rounded-lg bg-primary text-sm font-semibold text-primary-foreground shadow-sm shadow-primary/30">
             T
           </div>
-          <span className="text-sm font-semibold tracking-tight">Grupo Terza</span>
+          <div className="leading-tight">
+            <p className="text-sm font-semibold tracking-tight">Grupo Terza</p>
+            <p className="text-[11px] text-muted-foreground">Bienes raíces con futuro</p>
+          </div>
         </div>
 
         <nav ref={navRef} className="relative flex-1 space-y-0.5 p-3">

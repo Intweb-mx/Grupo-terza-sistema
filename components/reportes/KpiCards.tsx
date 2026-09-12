@@ -21,24 +21,28 @@ export function KpiCards({ kpis }: { kpis: Kpis }) {
     icono: LucideIcon
     nota?: string
     alerta?: boolean
+    chip: string
   }[] = [
     {
       etiqueta: 'Propiedades disponibles',
       valor: kpis.propiedades_disponibles,
       format: (n) => String(n),
       icono: Home,
+      chip: 'bg-primary/10 text-primary',
     },
     {
       etiqueta: 'Propiedades vendidas',
       valor: kpis.propiedades_vendidas,
       format: (n) => String(n),
       icono: Building2,
+      chip: 'bg-emerald-500/10 text-emerald-600',
     },
     {
       etiqueta: 'Ingresos del mes',
       valor: kpis.ingresos_mes_actual,
       format: formatearCentavos,
       icono: TrendingUp,
+      chip: 'bg-violet-500/10 text-violet-600',
     },
     {
       etiqueta: 'Cartera vencida',
@@ -47,6 +51,7 @@ export function KpiCards({ kpis }: { kpis: Kpis }) {
       icono: AlertTriangle,
       nota: `${kpis.clientes_en_mora} cliente${kpis.clientes_en_mora === 1 ? '' : 's'} en mora`,
       alerta: kpis.clientes_en_mora > 0,
+      chip: 'bg-destructive/10 text-destructive',
     },
   ]
 
@@ -54,17 +59,21 @@ export function KpiCards({ kpis }: { kpis: Kpis }) {
     <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
       {tarjetas.map((t, i) => (
         <Card key={t.etiqueta} style={{ animationDelay: `${i * 80}ms` }}>
-          <CardContent className="flex items-start justify-between">
+          <CardContent className="space-y-3">
+            <div
+              className={`flex size-9 items-center justify-center rounded-lg ${
+                t.alerta ? 'bg-destructive/10 text-destructive' : t.chip
+              }`}
+            >
+              <t.icono className="size-4" />
+            </div>
             <div>
-              <p className="text-xs text-muted-foreground">{t.etiqueta}</p>
-              <p className={`mt-1 text-2xl font-semibold ${t.alerta ? 'text-destructive' : ''}`}>
+              <p className={`text-2xl font-semibold ${t.alerta ? 'text-destructive' : ''}`}>
                 <CountUp value={t.valor} format={t.format} />
               </p>
+              <p className="text-xs text-muted-foreground">{t.etiqueta}</p>
               {t.nota && <p className="mt-0.5 text-xs text-muted-foreground">{t.nota}</p>}
             </div>
-            <t.icono
-              className={`size-5 ${t.alerta ? 'text-destructive' : 'text-muted-foreground'}`}
-            />
           </CardContent>
         </Card>
       ))}
