@@ -24,7 +24,7 @@ export function CarteraVencidaTabla({ filas }: { filas: FilaCartera[] }) {
   }
 
   return (
-    <div className="overflow-x-auto rounded-lg border bg-card">
+    <div className="overflow-x-auto rounded-[20px] border border-gray-200/70 bg-card">
       <Table className="min-w-[560px]">
         <TableHeader>
           <TableRow>
@@ -47,7 +47,7 @@ export function CarteraVencidaTabla({ filas }: { filas: FilaCartera[] }) {
                   variant="outline"
                   className={
                     f.dias_atraso > 3
-                      ? 'border-red-300 bg-red-100 text-red-800'
+                      ? 'border-orange-300 bg-orange-100 text-orange-800'
                       : 'border-amber-300 bg-amber-100 text-amber-800'
                   }
                 >

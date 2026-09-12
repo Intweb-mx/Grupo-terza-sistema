@@ -48,19 +48,22 @@ export function Sidebar({
 
   return (
     <aside className="hidden shrink-0 p-3 md:block">
-      <div className="flex h-[calc(100vh-1.5rem)] w-60 flex-col rounded-2xl border border-white/60 bg-white/65 shadow-[0_8px_30px_-12px_rgba(15,23,42,0.18)] backdrop-blur-xl backdrop-saturate-150">
+      <div className="flex h-[calc(100vh-1.5rem)] w-60 flex-col rounded-[20px] border border-white/60 bg-white/65 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.7),0_8px_30px_-12px_rgba(15,23,42,0.18)] backdrop-blur-xl backdrop-saturate-150">
         <div className="flex items-center gap-2 border-b border-white/50 px-5 py-4">
           <div className="flex size-8 items-center justify-center rounded-lg bg-primary text-sm font-semibold text-primary-foreground shadow-sm shadow-primary/30">
             T
           </div>
-          <span className="text-sm font-semibold tracking-tight">Grupo Terza</span>
+          <div className="leading-tight">
+            <p className="text-sm font-semibold tracking-tight">Grupo Terza</p>
+            <p className="text-[11px] text-muted-foreground">Bienes raíces con futuro</p>
+          </div>
         </div>
 
         <nav ref={navRef} className="relative flex-1 space-y-0.5 p-3">
           {indicador && (
             <div
               aria-hidden
-              className="absolute inset-x-3 rounded-xl bg-white/80 shadow-sm backdrop-blur-md transition-[top,height] duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] motion-reduce:transition-none"
+              className="absolute inset-x-3 rounded-xl bg-primary shadow-[0_0_0_1px_rgba(37,99,235,0.35),0_6px_18px_-4px_rgba(37,99,235,0.55)] transition-[top,height] duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] motion-reduce:transition-none"
               style={{ top: indicador.top, height: indicador.height }}
             />
           )}
@@ -75,7 +78,7 @@ export function Sidebar({
                 className={cn(
                   'group relative z-10 flex items-center gap-2.5 rounded-xl px-3 py-2 text-sm font-medium transition-colors duration-200',
                   activo
-                    ? 'text-primary'
+                    ? 'text-primary-foreground'
                     : 'text-muted-foreground hover:bg-white/50 hover:text-foreground hover:backdrop-blur-md'
                 )}
               >

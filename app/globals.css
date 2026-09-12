@@ -63,7 +63,11 @@
 /* Animación de "construcción" del logo (components/marketing/LogoMark.tsx).
    Estado final por defecto (sin animar) para que quien pida menos
    movimiento vea el emblema completo de una — la animación solo se activa
-   si el sistema no pidió prefers-reduced-motion. */
+   si el sistema no pidió prefers-reduced-motion. Cada pieza entra desde el
+   borde de pantalla más cercano a su posición real y gira hasta encajar
+   (los anillos "giran" como un engrane/reloj armándose). Las unidades del
+   transform son del sistema de coordenadas del viewBox (0 0 1200 1200), no
+   px de pantalla — por eso los valores grandes de traslado. */
 .logo-piece {
   transform-box: fill-box;
   transform-origin: center;
@@ -72,18 +76,79 @@
 @media (prefers-reduced-motion: no-preference) {
   .logo-piece {
     opacity: 0;
-    animation: logo-piece-in 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    animation-duration: 1.8s;
+    animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+    animation-fill-mode: forwards;
+  }
+  .logo-piece--anillo {
+    animation-name: logo-piece-anillo;
+  }
+  .logo-piece--arriba {
+    animation-name: logo-piece-arriba;
+  }
+  .logo-piece--abajo {
+    animation-name: logo-piece-abajo;
+  }
+  .logo-piece--izquierda {
+    animation-name: logo-piece-izquierda;
+  }
+  .logo-piece--derecha {
+    animation-name: logo-piece-derecha;
   }
 }
 
-@keyframes logo-piece-in {
+@keyframes logo-piece-anillo {
   from {
     opacity: 0;
-    transform: scale(0.82);
+    transform: scale(0.3) rotate(-320deg);
   }
   to {
     opacity: 1;
-    transform: scale(1);
+    transform: scale(1) rotate(0deg);
+  }
+}
+
+@keyframes logo-piece-arriba {
+  from {
+    opacity: 0;
+    transform: translateY(-2200px) rotate(-30deg);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) rotate(0deg);
+  }
+}
+
+@keyframes logo-piece-abajo {
+  from {
+    opacity: 0;
+    transform: translateY(2200px) rotate(25deg);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) rotate(0deg);
+  }
+}
+
+@keyframes logo-piece-izquierda {
+  from {
+    opacity: 0;
+    transform: translateX(-2200px) rotate(-70deg);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0) rotate(0deg);
+  }
+}
+
+@keyframes logo-piece-derecha {
+  from {
+    opacity: 0;
+    transform: translateX(2200px) rotate(70deg);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0) rotate(0deg);
   }
 }
 

@@ -16,6 +16,15 @@ import { ETAPAS, ETIQUETA_ETAPA, FUENTES } from './constantes'
 
 const TODAS = 'todas'
 
+const ACENTO_ETAPA: Record<string, { punto: string; borde: string }> = {
+  nuevo: { punto: 'bg-blue-500', borde: 'hover:border-blue-300' },
+  contactado: { punto: 'bg-sky-500', borde: 'hover:border-sky-300' },
+  interesado: { punto: 'bg-violet-500', borde: 'hover:border-violet-300' },
+  negociacion: { punto: 'bg-orange-500', borde: 'hover:border-orange-300' },
+  cerrado: { punto: 'bg-emerald-500', borde: 'hover:border-emerald-300' },
+  perdido: { punto: 'bg-red-400', borde: 'hover:border-red-300' },
+}
+
 type Prospecto = {
   id: string
   nombre: string
@@ -94,44 +103,59 @@ export function KanbanProspectos({ prospectos }: { prospectos: Prospecto[] }) {
       </div>
 
       <div className="grid grid-cols-1 gap-3 overflow-x-auto sm:grid-cols-3 lg:grid-cols-6">
-        {ETAPAS.map((etapa) => (
-          <div
-            key={etapa}
-            onDragOver={(e) => e.preventDefault()}
-            onDrop={() => soltarEn(etapa)}
-            className="min-h-[200px] rounded-lg border bg-muted/40 p-2"
-          >
-            <p className="mb-2 text-xs font-medium text-muted-foreground">
-              {ETIQUETA_ETAPA[etapa]}
-            </p>
-            <div className="space-y-2">
-              {(porEtapa.get(etapa) ?? []).map((p) => (
-                <Link
-                  key={p.id}
-                  href={`/prospectos/${p.id}`}
-                  draggable
-                  onDragStart={() => setArrastrando(p.id)}
-                  className={`block rounded-lg border bg-card p-2.5 text-sm shadow-xs transition-colors hover:border-primary/40 ${
-                    moviendo === p.id ? 'opacity-50' : ''
-                  }`}
-                >
-                  <p className="font-medium">{p.nombre}</p>
-                  {p.interes && (
-                    <p className="mt-0.5 line-clamp-1 text-xs text-muted-foreground">
-                      {p.interes}
-                    </p>
-                  )}
-                  {p.telefono && (
-                    <p className="mt-1 flex items-center gap-1 text-xs text-muted-foreground">
-                      <Phone className="size-3" />
-                      {p.telefono}
-                    </p>
-                  )}
-                </Link>
-              ))}
+        {ETAPAS.map((etapa) => {
+          const acento = ACENTO_ETAPA[etapa]
+          const prospectosEtapa = porEtapa.get(etapa) ?? []
+          return (
+            <div
+              key={etapa}
+              onDragOver={(e) => e.preventDefault()}
+              onDrop={() => soltarEn(etapa)}
+              className="min-h-[220px] rounded-[18px] border border-gray-200/70 bg-white p-3"
+            >
+              <div className="mb-3 flex items-center gap-1.5">
+                <span className={`size-1.5 rounded-full ${acento.punto}`} />
+                <p className="text-xs font-semibold text-foreground">{ETIQUETA_ETAPA[etapa]}</p>
+                <span className="ml-auto rounded-full bg-muted px-1.5 py-0.5 text-[10px] font-medium text-muted-foreground">
+                  {prospectosEtapa.length}
+                </span>
+              </div>
+
+              {prospectosEtapa.length === 0 ? (
+                <p className="px-1 text-center text-[11px] leading-snug text-muted-foreground">
+                  Arrastra aquí los prospectos {etapa === 'nuevo' ? '' : `en ${ETIQUETA_ETAPA[etapa].toLowerCase()}`}.
+                </p>
+              ) : (
+                <div className="space-y-2">
+                  {prospectosEtapa.map((p) => (
+                    <Link
+                      key={p.id}
+                      href={`/prospectos/${p.id}`}
+                      draggable
+                      onDragStart={() => setArrastrando(p.id)}
+                      className={`block rounded-xl border border-gray-200/70 bg-white p-2.5 text-sm shadow-[0_1px_2px_rgba(15,23,42,0.04)] transition-[border-color,box-shadow] duration-200 hover:shadow-[0_4px_12px_-4px_rgba(15,23,42,0.15)] ${acento.borde} ${
+                        moviendo === p.id ? 'opacity-50' : ''
+                      }`}
+                    >
+                      <p className="font-medium">{p.nombre}</p>
+                      {p.interes && (
+                        <p className="mt-0.5 line-clamp-1 text-xs text-muted-foreground">
+                          {p.interes}
+                        </p>
+                      )}
+                      {p.telefono && (
+                        <p className="mt-1 flex items-center gap-1 text-xs text-muted-foreground">
+                          <Phone className="size-3" />
+                          {p.telefono}
+                        </p>
+                      )}
+                    </Link>
+                  ))}
+                </div>
+              )}
             </div>
-          </div>
-        ))}
+          )
+        })}
       </div>
     </div>
   )

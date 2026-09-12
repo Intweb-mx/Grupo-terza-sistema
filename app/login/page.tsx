@@ -2,14 +2,13 @@
 
 import { useState, type FormEvent } from 'react'
 import { useRouter } from 'next/navigation'
-import { AlertCircle } from 'lucide-react'
+import { AlertCircle, Lock } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
-import { BackgroundMesh } from '@/components/shell/BackgroundMesh'
 
 export default function LoginPage() {
   const router = useRouter()
@@ -41,15 +40,21 @@ export default function LoginPage() {
   }
 
   return (
-    <main className="flex flex-1 items-center justify-center bg-muted/40 p-6">
-      <BackgroundMesh />
+    <main className="relative flex flex-1 items-center justify-center bg-white p-6">
+      <div
+        aria-hidden
+        className="pointer-events-none fixed inset-0 -z-10 bg-gradient-to-t from-blue-100 via-blue-50/30 to-white"
+      />
+
+      <p className="absolute top-6 right-6 text-xs text-muted-foreground">Sistema inmobiliario</p>
+
       <Card className="w-full max-w-sm">
         <CardHeader>
           <div className="mb-2 flex size-10 items-center justify-center rounded-lg bg-primary text-lg font-semibold text-primary-foreground">
             T
           </div>
           <CardTitle className="text-xl">Iniciar sesión</CardTitle>
-          <CardDescription>Grupo Terza · Sistema inmobiliario</CardDescription>
+          <CardDescription>Accede a tu espacio de trabajo.</CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
@@ -60,6 +65,7 @@ export default function LoginPage() {
                 type="email"
                 required
                 autoComplete="email"
+                placeholder="nombre@empresa.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
               />
@@ -88,6 +94,11 @@ export default function LoginPage() {
               {loading ? 'Entrando…' : 'Entrar'}
             </Button>
           </form>
+
+          <p className="mt-4 flex items-center justify-center gap-1.5 text-xs text-muted-foreground">
+            <Lock className="size-3" />
+            Tus datos están protegidos.
+          </p>
         </CardContent>
       </Card>
     </main>

@@ -12,6 +12,19 @@ import { Card, CardContent } from '@/components/ui/card'
 
 const ROLES_PANEL_EJECUTIVO = ['dueno', 'administrador', 'contador']
 
+function saludoPorHora() {
+  const hora = Number(
+    new Intl.DateTimeFormat('es-MX', {
+      hour: 'numeric',
+      hour12: false,
+      timeZone: 'America/Mexico_City',
+    }).format(new Date())
+  )
+  if (hora < 12) return 'Buenos días'
+  if (hora < 19) return 'Buenas tardes'
+  return 'Buenas noches'
+}
+
 function contarPorEtapa(prospectos: { etapa: string | null }[]) {
   const conteo: Record<string, number> = {}
   for (const p of prospectos) {
@@ -37,7 +50,9 @@ export default async function DashboardPage() {
     return (
       <div className="space-y-8">
         <div>
-          <h1 className="text-2xl font-semibold tracking-tight">Panel ejecutivo</h1>
+          <h1 className="text-2xl font-semibold tracking-tight">
+            {saludoPorHora()}, {usuario.nombre.split(' ')[0]}
+          </h1>
           <p className="text-sm text-muted-foreground">Vista general del negocio</p>
         </div>
 

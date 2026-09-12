@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from 'react'
 import Link from 'next/link'
-import { Search } from 'lucide-react'
+import { ChevronRight, Search } from 'lucide-react'
 import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
 import {
@@ -13,6 +13,10 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
+
+function iniciales(nombre: string, apellidos: string) {
+  return `${nombre[0] ?? ''}${apellidos[0] ?? ''}`.toUpperCase()
+}
 
 type Cliente = {
   id: string
@@ -47,29 +51,49 @@ export function ClientesListado({ clientes }: { clientes: Cliente[] }) {
       {filtrados.length === 0 ? (
         <p className="text-sm text-muted-foreground">No hay clientes con esa búsqueda.</p>
       ) : (
-        <div className="rounded-lg border bg-card">
+        <div className="overflow-hidden rounded-[20px] border border-gray-200/70 bg-card">
           <Table>
             <TableHeader>
               <TableRow>
                 <TableHead>Cliente</TableHead>
                 <TableHead>Estado de cuenta</TableHead>
+                <TableHead className="w-10" />
               </TableRow>
             </TableHeader>
             <TableBody>
               {filtrados.map((c) => (
                 <TableRow key={c.id} className="cursor-pointer">
                   <TableCell className="p-0">
-                    <Link href={`/clientes/${c.id}`} className="block px-4 py-3 font-medium">
-                      {c.nombre} {c.apellidos}
+                    <Link href={`/clientes/${c.id}`} className="flex items-center gap-3 px-4 py-4">
+                      <span className="flex size-9 shrink-0 items-center justify-center rounded-full bg-primary/10 text-xs font-semibold text-primary">
+                        {iniciales(c.nombre, c.apellidos)}
+                      </span>
+                      <span className="font-medium">
+                        {c.nombre} {c.apellidos}
+                      </span>
                     </Link>
                   </TableCell>
                   <TableCell className="p-0">
-                    <Link href={`/clientes/${c.id}`} className="flex px-4 py-3">
+                    <Link href={`/clientes/${c.id}`} className="flex items-center px-4 py-4">
                       {c.estado_pago ? (
-                        <Badge variant="outline">{c.estado_pago}</Badge>
+                        <Badge
+                          variant="outline"
+                          className="gap-1.5 border-emerald-200 bg-emerald-50 text-emerald-700"
+                        >
+                          <span className="size-1.5 rounded-full bg-emerald-500" />
+                          {c.estado_pago}
+                        </Badge>
                       ) : (
-                        <span className="text-xs text-muted-foreground">Ver detalle</span>
+                        <span className="text-xs text-muted-foreground">Sin datos de cobranza aún</span>
                       )}
+                    </Link>
+                  </TableCell>
+                  <TableCell className="p-0">
+                    <Link
+                      href={`/clientes/${c.id}`}
+                      className="flex items-center justify-end px-4 py-4"
+                    >
+                      <ChevronRight className="size-4 text-muted-foreground" />
                     </Link>
                   </TableCell>
                 </TableRow>

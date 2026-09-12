@@ -8,6 +8,7 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { COLOR_POR_ESTADO, ROLES_CON_PERMISO_ESCRITURA } from '@/components/propiedades/constantes'
+import { VolverLink } from '@/components/shell/VolverLink'
 
 export default async function PropiedadDetallePage({
   params,
@@ -24,6 +25,7 @@ export default async function PropiedadDetallePage({
 
   return (
     <div className="max-w-3xl space-y-6">
+      <VolverLink href="/propiedades" label="Volver a propiedades" />
       <div className="flex items-start justify-between">
         <div>
           <h1 className="text-2xl font-semibold tracking-tight">{propiedad.titulo}</h1>
